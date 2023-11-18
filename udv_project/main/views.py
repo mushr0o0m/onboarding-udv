@@ -1,22 +1,19 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .models import YouTubeVideo
-from .serializer import YouTubeVideoSerializer
+from .models import *
+from .serializer import *
+from rest_framework import viewsets, mixins
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
 
-class YouTubeVideoView(APIView):
-    def get(self, request):
-        output = [
-            {
-                "title": output.title,
-                "channel": output.channel
-            } for output in YouTubeVideo.objects.all()
-        ]
-        return Response(output)
+class YouTubeVideoView(viewsets.ModelViewSet):
+    queryset = YouTubeVideo.objects.all()
+    serializer_class = YouTubeVideoSerializer
 
-    def post(self, request):
-        seriallizer = YouTubeVideoSerializer(data=request.data)
-        if seriallizer.is_valid(raise_exception=True):
-            seriallizer.save()
-            return Response(seriallizer.data)
+
+class ChannelView(viewsets.ModelViewSet):
+    queryset = Channel.objects.all()
+    serializer_class = ChannelSerializer
+
+
