@@ -7,13 +7,13 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 
-class YouTubeVideoView(viewsets.ModelViewSet):
+'''class YouTubeVideoView(viewsets.ModelViewSet):
     queryset = YouTubeVideo.objects.all()
     serializer_class = YouTubeVideoSerializer
 
 
 class ChannelView(viewsets.ModelViewSet):
     queryset = Channel.objects.all()
-    serializer_class = ChannelSerializer
+    serializer_class = ChannelSerializer'''
 
 
