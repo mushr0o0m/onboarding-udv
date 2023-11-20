@@ -9,7 +9,8 @@ from rest_framework.viewsets import GenericViewSet
 
 class TasksView(APIView):
     def get(self, request):
-        tasks = Task.objects.filter(worker_id=request.user.id)
+        worker = Worker.objects.get(user_id=request.user.id)
+        tasks = Task.objects.filter(worker_id=worker.id)
         tasks_list = []
 
         for task in tasks:
@@ -64,8 +65,39 @@ class WorkersView(APIView):
     def get(self, request):
         hr = Hr.objects.get(user_id=request.user.id)
         workers = Worker.objects.filter(hr_id=hr.id)
+        workers_list = []
+        for worker in workers:
+            user = User.objects.get(id=worker.user_id)
 
-        return Response({'workers': WorkersSerializer(workers, many=True).data})
+            tasks = Task.objects.filter(worker_id=worker.id)
+            tasks_list = []
+
+            for task in tasks:
+                subtasks_list = []
+                subtasks = Subtask.objects.filter(task_id=task.id)
+                for subtask in subtasks:
+                    subtasks_list.append(SubtaskSerializer(subtask).data)
+                task_dict = {'id': task.id,
+                             'worker_id': task.worker_id,
+                             'name': task.name,
+                             'result': task.result,
+                             'is_completed': task.is_completed,
+                             'subtasks': subtasks_list}
+                tasks_list.append(TaskSerializer(task_dict).data)
+
+            workers_list.append(WorkersSerializer({'id': worker.id,
+                                                   'name': worker.name,
+                                                   'surname': worker.surname,
+                                                   'patronumic': worker.patronumic,
+                                                   'hr_id': worker.hr_id,
+                                                   'jobTitle': worker.jobTitle,
+                                                   'employmentDate': worker.employmentDate,
+                                                   'email': user.email,
+                                                   'user_id': user.id,
+                                                   'tasks': tasks_list
+                                                   }).data)
+
+        return Response({'workers': workers_list})
 
 
 class WhoView(APIView):
