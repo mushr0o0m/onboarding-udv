@@ -24,7 +24,7 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, password=None, who='HR', **extra_fields):
+    def create_user(self, email, password=None, who='WR', **extra_fields):
         extra_fields.setdefault('is_superuser', False)
         return self._create_user(email, password, who, **extra_fields)
 
@@ -93,7 +93,7 @@ class Hr(models.Model):
 class Worker(models.Model):
     name = models.CharField(max_length=100, default="")
     surname = models.CharField(max_length=100, default="")
-    patronumic = models.CharField(max_length=100, default="")
+    patronymic = models.CharField(max_length=100, default="")
     hr_id = models.ForeignKey(Hr, on_delete=models.CASCADE, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, verbose_name="Аккаунт пользователя")
     jobTitle = models.CharField(max_length=100, default="")

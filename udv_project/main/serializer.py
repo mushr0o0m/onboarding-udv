@@ -22,7 +22,7 @@ class SubtaskSerializer(serializers.Serializer):
         return instance
 
 
-class TaskSerializer(serializers.Serializer):
+class TasksSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     worker_id = serializers.IntegerField()
     name = serializers.CharField()
@@ -35,12 +35,29 @@ class WorkersSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
     surname = serializers.CharField()
-    patronumic = serializers.CharField()
+    patronymic = serializers.CharField()
     hr_id = serializers.IntegerField()
     jobTitle = serializers.CharField()
     employmentDate = serializers.DateField()
     email = serializers.CharField()
     user_id = serializers.IntegerField()
     tasks = serializers.JSONField()
-    # hr_id = serializers.SlugRelatedField(queryset=Hr.objects.all(), slug_field='id')
-    # user_id = serializers.SlugRelatedField(read_only=True, slug_field='id')
+
+
+class WorkerPutSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    surname = serializers.CharField()
+    patronymic = serializers.CharField()
+    jobTitle = serializers.CharField()
+    employmentDate = serializers.DateField()
+    hr_id = serializers.SlugRelatedField(queryset=Hr.objects.all(), slug_field='id')
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get("name", instance.name)
+        instance.surname = validated_data.get("surname", instance.surname)
+        instance.patronymic = validated_data.get("patronymic", instance.patronymic)
+        instance.jobTitle = validated_data.get("jobTitle", instance.jobTitle)
+        instance.employmentDate = validated_data.get("employmentDate", instance.employmentDate)
+        instance.hr_id = validated_data.get("hr_id", instance.hr_id)
+        instance.save()
+        return instance

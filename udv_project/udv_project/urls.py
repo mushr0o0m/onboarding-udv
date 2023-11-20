@@ -21,11 +21,6 @@ from django.urls import re_path as url
 from main.views import *
 from rest_framework import routers
 
-'''routerYouTubeVideoView = routers.SimpleRouter()
-routerYouTubeVideoView.register(r'youtube', YouTubeVideoView)
-routerChannel = routers.SimpleRouter()
-routerChannel.register(r'Channel', ChannelView)'''
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('djoser.urls')),
@@ -34,7 +29,5 @@ urlpatterns = [
     path('api/tasklist/<int:pk>/', TasksView.as_view()),
     path('api/workers/', WorkersView.as_view()),
     path('api/who/', WhoView.as_view()),
-    # path('api/', include(routerYouTubeVideoView.urls)),
-    # path('api/', include(routerChannel.urls)),
-
+    path('api/worker/<int:pk>/', WorkerView.as_view())
 ]
