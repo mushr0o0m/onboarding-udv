@@ -163,3 +163,42 @@ class WorkerView(APIView):
         instance = Worker.objects.get(id=pk)
         instance.delete()
         return Response({'delete': 'ok'})
+
+
+class OnlyTasksView(APIView):
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        worker = Worker.objects.get(pk=pk)
+        tasks = Task.objects.filter(worker_id=worker.id)
+        return Response({'tasks': OnlyTasksReadSerializer(tasks, many=True).data})
+
+    def post(self, request):
+        serializer = OnlyTasksSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'post': serializer.data})
+
+    def put(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method PUT not allowed"})
+
+        instance = Task.objects.get(pk=pk)
+
+        serializer = OnlyTasksSerializer(data=request.data, instance=instance)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'post': serializer.data})
+
+    def delete(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method PUT not allowed"})
+        try:
+            instance = Task.objects.get(pk=pk)
+        except:
+            return Response({"error": "Object does not exists"})
+
+        instance = Task.objects.get(pk=pk)
+        instance.delete()
+        return Response({'delete': 'ok'})

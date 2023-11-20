@@ -29,5 +29,7 @@ urlpatterns = [
     path('api/tasklist/<int:pk>/', TasksView.as_view()),
     path('api/workers/', WorkersView.as_view()),
     path('api/who/', WhoView.as_view()),
-    path('api/worker/<int:pk>/', WorkerView.as_view())
+    path('api/worker/<int:pk>/', WorkerView.as_view()),
+    path('api/tasks/', OnlyTasksView.as_view()),
+    path('api/tasks/<int:pk>/', OnlyTasksView.as_view())
 ]
