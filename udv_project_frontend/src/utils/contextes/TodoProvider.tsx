@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { TodoContext } from './TodoContext';
 
@@ -5,63 +6,63 @@ interface TodoProviderProps {
     children: React.ReactNode;
 }
 
-const DEFAULT_TODO_LIST = [
-    { id: 1, name: 'task 1', description: 'description 1', checked: false },
-    { id: 2, name: 'task 2', description: 'description 2', checked: false },
-    {
-        id: 3,
-        name: 'task 3',
-        description:
-            'so long task description 3 so long task description so long task description so long task description so long task description',
-        checked: true
-    }
+const EXAMPLE_TASK_LIST = [
+    { id: 1, name: 'task 1', checked: false },
+    { id: 2, name: 'task 2', checked: false },
+    { id: 3, name: 'task 3', checked: true }
+];
+
+const EXAMPLE_SUBTASK_LIST = [
+    { id: 1, name: 'subTask 1', checked: false, taskId: EXAMPLE_TASK_LIST[0].id, description: '', result: '' },
+    { id: 2, name: 'subTask 2', checked: false, taskId: EXAMPLE_TASK_LIST[0].id, description: '', result: '' },
+    { id: 3, name: 'subTask 3', checked: true, taskId: EXAMPLE_TASK_LIST[0].id, description: '', result: '' }
 ];
 
 export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
-    const [todos, setTodos] = React.useState(DEFAULT_TODO_LIST);
-    const [todoIdForEdit, setTodoIdForEdit] = React.useState<Todo['id'] | null>(null);
+    const [subTasks, setSubTasks] = React.useState(EXAMPLE_SUBTASK_LIST);
+    const [subTasksIdForEdit, setSubTasksIdForEdit] = React.useState<SubTask['id'] | null>(null);
 
-    const selectTodoIdForEdit = React.useCallback((id: Todo['id']) => {
-        setTodoIdForEdit(id);
-    }, []);
+    const selectSubTasksIdForEdit = (id: SubTask['id']) => {
+        setSubTasksIdForEdit(id);
+    };
 
-    const addTodo = React.useCallback(({ name, description }: Omit<Todo, 'checked' | 'id'>) => {
-        setTodos((prevTodos) => [
+    const addSubTaskToTask = ({ name, description, result, taskId }: Omit<SubTask, 'checked' | 'id'>) => {
+        setSubTasks((prevTodos) => [
             ...prevTodos,
-            { id: prevTodos[prevTodos.length - 1].id + 1, description, name, checked: false }
+            { id: prevTodos[prevTodos.length - 1].id + 1, description, name, checked: false, taskId, result }
         ]);
-    }, []);
+    };
 
-    const checkTodo = React.useCallback((id: Todo['id']) => {
-        setTodos((prevTodos) =>
-            prevTodos.map((todo) => (todo.id === id ? { ...todo, checked: !todo.checked } : todo))
+    const markSubTask = (id: SubTask['id']) => {
+        setSubTasks((prevTodos) =>
+            prevTodos.map((subTask) => (subTask.id === id ? { ...subTask, checked: !subTask.checked } : subTask))
         );
-    }, []);
+    };
 
-    const deleteTodo = React.useCallback((id: Todo['id']) => {
-        setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
-    }, []);
+    const deleteSubTask = (id: SubTask['id']) => {
+        setSubTasks((prevTodos) => prevTodos.filter((subTask) => subTask.id !== id));
+    };
 
-    const changeTodo = React.useCallback(({ name, description }: Omit<Todo, 'checked' | 'id'>) => {
-        setTodos((prevTodos) =>
-            prevTodos.map((todo) =>
-                todo.id === todoIdForEdit ? { ...todo, name, description } : todo
+    const editSubTask = ({ name, description, result, taskId }: Omit<SubTask, 'checked' | 'id'>) => {
+        setSubTasks((prevTodos) =>
+            prevTodos.map((subTask) =>
+                subTask.id === subTasksIdForEdit ? { ...subTask, name, description, result, taskId } : subTask
             )
         );
-        setTodoIdForEdit(null);
-    }, [todoIdForEdit]);
+        setSubTasksIdForEdit(null);
+    };
 
     const value = React.useMemo(
         () => ({
-            todos,
-            todoIdForEdit,
-            addTodo,
-            deleteTodo,
-            checkTodo,
-            changeTodo,
-            selectTodoIdForEdit
+            subTasks,
+            subTasksIdForEdit,
+            addSubTaskToTask,
+            deleteSubTask,
+            markSubTask,
+            editSubTask,
+            selectSubTasksIdForEdit
         }),
-        [todos, todoIdForEdit, addTodo, deleteTodo, checkTodo, changeTodo, selectTodoIdForEdit]
+        [subTasks, subTasksIdForEdit, addSubTaskToTask, deleteSubTask, editSubTask, markSubTask, selectSubTasksIdForEdit]
     );
 
     return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;

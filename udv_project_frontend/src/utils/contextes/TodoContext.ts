@@ -1,21 +1,21 @@
 import React from "react";
 
 export interface TodoContextProps {
-    todos: Todo[];
-    todoIdForEdit: Todo['id'] | null;
-    addTodo: ({ name, description }: Omit<Todo, 'checked' | 'id'>) => void;
-    checkTodo: (id: Todo['id']) => void;
-    deleteTodo: (id: Todo['id']) => void;
-    selectTodoIdForEdit: (id: Todo['id']) => void;
-    changeTodo: ({ name, description }: Omit<Todo, 'id' | 'checked'>) => void;
+    subTasks: SubTask[];
+    subTasksIdForEdit: SubTask['id'] | null;
+    addSubTaskToTask: ({ name, description, result, taskId }: Omit<SubTask, 'checked' | 'id'>) => void;
+    deleteSubTask: (id: SubTask['id']) => void;
+    markSubTask: (id: SubTask['id']) => void;
+    editSubTask: ({ name, description, result, taskId }: Omit<SubTask, 'id' | 'checked'>) => void;
+    selectSubTasksIdForEdit: (id: SubTask['id']) => void;
 }
 
 export const TodoContext = React.createContext<TodoContextProps>({
-    todos: [],
-    todoIdForEdit: null,
-    addTodo: () => {},
-    deleteTodo: () => {},
-    checkTodo: () => {},
-    changeTodo: () => {},
-    selectTodoIdForEdit: () => {}
-})
+    subTasks: [],
+    subTasksIdForEdit: null,
+    addSubTaskToTask: () => {},
+    deleteSubTask: () => {},
+    markSubTask: () => {},
+    editSubTask: () => {},
+    selectSubTasksIdForEdit: () => {}
+});

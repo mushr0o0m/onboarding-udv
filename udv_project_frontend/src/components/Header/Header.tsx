@@ -5,11 +5,11 @@ import { useTodo } from '../../utils';
 
 
 export const Header: React.FC = () => {
-    const { todos } = useTodo();
+    const { subTasks } = useTodo();
     return (
         <div className={styles.header_container}>
             <div>
-                Todo list <b>{todos.length}</b> task(s)
+                Todo list <b>{subTasks.length}</b> task(s)
             </div>
         </div>
     )
