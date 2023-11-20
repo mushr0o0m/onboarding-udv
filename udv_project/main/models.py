@@ -78,14 +78,45 @@ class User(AbstractBaseUser, PermissionsMixin):
             elif self.who == 'HR' and not Hr.objects.filter(user=self).exists():
                 Hr.objects.create(user=self)
 
+    def __str__(self):
+        return self.email
+
 
 class Hr(models.Model):
     name = models.CharField(max_length=100)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, verbose_name="Аккаунт пользователя")
 
+    def __str__(self):
+        return self.name
+
 
 class Worker(models.Model):
     name = models.CharField(max_length=100)
+    hr_id = models.ForeignKey(Hr, on_delete=models.CASCADE, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, verbose_name="Аккаунт пользователя")
 
+    def __int__(self):
+        return self.id
 
+
+class Task(models.Model):
+    worker_id = models.ForeignKey(Worker, on_delete=models.CASCADE, null=True)
+    text = models.CharField(max_length=100)
+    result = models.CharField(max_length=100)
+    is_completed = models.BooleanField()
+
+    def __str__(self):
+        return self.text
+
+    def __int__(self):
+        return self.id
+
+
+class Subtask(models.Model):
+    task_id = models.ForeignKey(Task, on_delete=models.CASCADE, null=True)
+    text = models.CharField(max_length=100)
+    result = models.CharField(max_length=100)
+    is_completed = models.BooleanField()
+
+    def __str__(self):
+        return self.text

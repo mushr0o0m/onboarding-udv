@@ -7,13 +7,20 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 
-'''class YouTubeVideoView(viewsets.ModelViewSet):
-    queryset = YouTubeVideo.objects.all()
-    serializer_class = YouTubeVideoSerializer
+class TasksView(APIView):
+    def get(self, request):
+        tasks = Task.objects.filter(worker_id=request.user.id)
+        tasks_list = []
 
-
-class ChannelView(viewsets.ModelViewSet):
-    queryset = Channel.objects.all()
-    serializer_class = ChannelSerializer'''
-
-
+        for task in tasks:
+            subtasks_list = []
+            subtasks = Subtask.objects.filter(task_id=task.id)
+            for subtask in subtasks:
+                subtasks_list.append(SubtaskSerializer(subtask).data)
+            task_dict = {'worker_id': task.worker_id,
+                         'text': task.text,
+                         'result': task.result,
+                         'is_completed': task.is_completed,
+                         'subtasks': subtasks_list}
+            tasks_list.append(TaskSerializer(task_dict).data)
+        return Response({'tasks': tasks_list})

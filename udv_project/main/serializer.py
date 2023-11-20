@@ -2,13 +2,19 @@ from rest_framework import serializers
 from .models import *
 
 
-'''class YouTubeVideoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = YouTubeVideo
-        fields = "__all__"
+class SubtaskSerializer(serializers.Serializer):
+    task_id = serializers.IntegerField()
+    text = serializers.CharField()
+    result = serializers.CharField()
+    is_completed = serializers.BooleanField()
+
+    def create(self, validated_data):
+        return Subtask.objects.create(**validated_data)
 
 
-class ChannelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Channel
-        fields = "__all__"'''
+class TaskSerializer(serializers.Serializer):
+    worker_id = serializers.IntegerField()
+    text = serializers.CharField()
+    result = serializers.CharField()
+    is_completed = serializers.BooleanField()
+    subtasks = serializers.JSONField()

@@ -4,4 +4,5 @@ from .models import *
 admin.site.register(User)
 admin.site.register(Hr)
 admin.site.register(Worker)
-
+admin.site.register(Task)
+admin.site.register(Subtask)
