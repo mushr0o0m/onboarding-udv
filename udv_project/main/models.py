@@ -24,11 +24,11 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, password=None, who='WR', **extra_fields):
+    def create_user(self, email, password=None, who='HR', **extra_fields):
         extra_fields.setdefault('is_superuser', False)
         return self._create_user(email, password, who, **extra_fields)
 
-    def create_superuser(self, email, password, who='WR', **extra_fields):
+    def create_superuser(self, email, password, who='HR', **extra_fields):
         extra_fields.setdefault('is_superuser', True)
 
         if extra_fields.get('is_superuser') is not True:
@@ -86,14 +86,18 @@ class Hr(models.Model):
     name = models.CharField(max_length=100)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, verbose_name="Аккаунт пользователя")
 
-    def __str__(self):
-        return self.name
+    def __int__(self):
+        return self.id
 
 
 class Worker(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, default="")
+    surname = models.CharField(max_length=100, default="")
+    patronumic = models.CharField(max_length=100, default="")
     hr_id = models.ForeignKey(Hr, on_delete=models.CASCADE, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, verbose_name="Аккаунт пользователя")
+    jobTitle = models.CharField(max_length=100, default="")
+    employmentDate = models.DateField(null=True)
 
     def __int__(self):
         return self.id
@@ -101,7 +105,7 @@ class Worker(models.Model):
 
 class Task(models.Model):
     worker_id = models.ForeignKey(Worker, on_delete=models.CASCADE, null=True)
-    text = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     result = models.CharField(max_length=100)
     is_completed = models.BooleanField()
 
@@ -114,7 +118,7 @@ class Task(models.Model):
 
 class Subtask(models.Model):
     task_id = models.ForeignKey(Task, on_delete=models.CASCADE, null=True)
-    text = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     result = models.CharField(max_length=100)
     is_completed = models.BooleanField()
 

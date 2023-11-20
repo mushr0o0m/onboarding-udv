@@ -31,6 +31,9 @@ urlpatterns = [
     path('api/auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
     path('api/tasklist/', TasksView.as_view()),
+    path('api/tasklist/<int:pk>/', TasksView.as_view()),
+    path('api/workers/', WorkersView.as_view()),
+    path('api/who/', WhoView.as_view()),
     # path('api/', include(routerYouTubeVideoView.urls)),
     # path('api/', include(routerChannel.urls)),
 
