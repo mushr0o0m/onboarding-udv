@@ -3,40 +3,60 @@ import React from "react";
 import styles from './TodoPanel.module.css'
 import { Button } from "../BtnGroup/BtnGroup";
 import { useTodo } from "../../utils";
+import { Form } from "react-bootstrap";
 
-const DEFAULT_TODO = {
+// const EXAMPLE_TASK_LIST = [
+//   { id: 1, name: 'task 1', checked: false },
+//   { id: 2, name: 'task 2', checked: false },
+//   { id: 3, name: 'task 3', checked: true }
+// ];
+
+const DEFAULT_SUBTASK = {
   name: '',
   description: '',
+  taskId: 0,
+  result: ''
 };
 
-interface AddTodoPanelProps {
+interface AddSubTaskToTaskPanelProps {
   mode: 'add';
 }
 
-interface EditTodoPanelProps {
+interface EditSubTaskPanelProps {
   mode: 'edit';
-  editTodo: Omit<Todo, 'id' | 'checked'>;
+  editSubTask: Omit<SubTask, 'id' | 'checked'>;
 }
 
-type TodoPanelProps = AddTodoPanelProps | EditTodoPanelProps;
+type TodoPanelProps = AddSubTaskToTaskPanelProps | EditSubTaskPanelProps;
 
 export const TodoPanel: React.FC<TodoPanelProps> = (props) => {
   const isEdit = props.mode === 'edit';
-  const {changeTodo, addTodo} = useTodo();
-  const [todo, setTodo] = React.useState(isEdit ? props.editTodo : DEFAULT_TODO);
+  const { editSubTask, addSubTaskToTask } = useTodo();
+  const [subTask, setSubTask] = React.useState(isEdit ? props.editSubTask : DEFAULT_SUBTASK);
+  const [parentTask, setParentTask] = React.useState(0);
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setTodo({ ...todo, [name]: value });
+    setSubTask({ ...subTask, [name]: value });
+  };
+
+  const selectParentTask = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log(event.target.value)
+    setParentTask(parseInt(event.target.value));
   };
 
   const onClick = () => {
-    const todoItem = { name: todo.name, description: todo.description };
+    const subTaskItem = {
+      name: subTask.name,
+      description: subTask.description,
+      taskId: parentTask,
+      result: subTask.result
+    };
     if (isEdit) {
-      return changeTodo(todoItem);
+      return editSubTask(subTaskItem);
     }
-    addTodo(todoItem);
-    setTodo(DEFAULT_TODO);
+    addSubTaskToTask(subTaskItem);
+    setSubTask(DEFAULT_SUBTASK);
   }
 
   return (
@@ -48,7 +68,7 @@ export const TodoPanel: React.FC<TodoPanelProps> = (props) => {
             <input type="text"
               id='name'
               name='name'
-              value={todo.name}
+              value={subTask.name}
               onChange={onChange} />
           </label>
         </div>
@@ -58,9 +78,21 @@ export const TodoPanel: React.FC<TodoPanelProps> = (props) => {
             <input type="text"
               id="description"
               name="description"
-              value={todo.description}
+              value={subTask.description}
               onChange={onChange} />
           </label>
+        </div>
+        <div className={styles.field_container}>
+          <Form.Group controlId="selectTask">
+            <Form.Label>Задача</Form.Label>
+            <Form.Select aria-label="Default select example" defaultValue={subTask.taskId.toString()} onChange={selectParentTask}>
+              <option>Open this select menu</option>
+              <option value="1">One</option>
+              <option value="2">Two</option>
+              <option value="3">Three</option>
+            </Form.Select>
+          </Form.Group>
+
         </div>
       </div>
 

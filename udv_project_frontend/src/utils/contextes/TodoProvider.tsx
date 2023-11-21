@@ -1,68 +1,129 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { TodoContext } from './TodoContext';
+import { getSubtaskList, getTaskList, postSubtask, putSubtask, putTask } from '../requests/TodoRequests';
+import { useAuth } from './AuthContext/useAuth';
 
 interface TodoProviderProps {
     children: React.ReactNode;
 }
 
-const DEFAULT_TODO_LIST = [
-    { id: 1, name: 'task 1', description: 'description 1', checked: false },
-    { id: 2, name: 'task 2', description: 'description 2', checked: false },
-    {
-        id: 3,
-        name: 'task 3',
-        description:
-            'so long task description 3 so long task description so long task description so long task description so long task description',
-        checked: true
-    }
-];
-
 export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
-    const [todos, setTodos] = React.useState(DEFAULT_TODO_LIST);
-    const [todoIdForEdit, setTodoIdForEdit] = React.useState<Todo['id'] | null>(null);
+    const [subTasks, setSubTasks] = React.useState<SubTask[]>([]);
+    const [subTasksIdForEdit, setSubTasksIdForEdit] = React.useState<SubTask['id'] | null>(null);
+    const [tasks, setTasks] = React.useState<Task[]>([]);
+    const { token } = useAuth();
 
-    const selectTodoIdForEdit = React.useCallback((id: Todo['id']) => {
-        setTodoIdForEdit(id);
-    }, []);
+    React.useEffect(() => {
+        const fetchTaskList = async () => {
+            try {
+                const taskList = await getTaskList(token);
+                setTasks(taskList);
+            } catch (error) {
+                console.error('Error fetching task list:', error);
+            }
+        };
 
-    const addTodo = React.useCallback(({ name, description }: Omit<Todo, 'checked' | 'id'>) => {
-        setTodos((prevTodos) => [
-            ...prevTodos,
-            { id: prevTodos[prevTodos.length - 1].id + 1, description, name, checked: false }
-        ]);
-    }, []);
+        if (token) {
+            fetchTaskList();
+        }
+    }, [token]);
 
-    const checkTodo = React.useCallback((id: Todo['id']) => {
-        setTodos((prevTodos) =>
-            prevTodos.map((todo) => (todo.id === id ? { ...todo, checked: !todo.checked } : todo))
-        );
-    }, []);
+    React.useEffect(() => {
+        const fetchTaskList = async () => {
+            try {
+                const subtaskList = await getSubtaskList(token);
+                setSubTasks(subtaskList);
+            } catch (error) {
+                console.error('Error fetching subtask list:', error);
+            }
+        };
 
-    const deleteTodo = React.useCallback((id: Todo['id']) => {
-        setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
-    }, []);
+        if (token) {
+            fetchTaskList();
+        }
+    }, [token]);
 
-    const changeTodo = React.useCallback(({ name, description }: Omit<Todo, 'checked' | 'id'>) => {
-        setTodos((prevTodos) =>
-            prevTodos.map((todo) =>
-                todo.id === todoIdForEdit ? { ...todo, name, description } : todo
-            )
-        );
-        setTodoIdForEdit(null);
-    }, [todoIdForEdit]);
+    const selectSubTasksIdForEdit = (id: SubTask['id']) => {
+        setSubTasksIdForEdit(id);
+    };
 
-    const value = React.useMemo(
-        () => ({
-            todos,
-            todoIdForEdit,
-            addTodo,
-            deleteTodo,
-            checkTodo,
-            changeTodo,
-            selectTodoIdForEdit
-        }),
-        [todos, todoIdForEdit, addTodo, deleteTodo, checkTodo, changeTodo, selectTodoIdForEdit]
-    );
+    const addSubTaskToTask = ({ name, description, result, taskId }: Omit<SubTask, 'checked' | 'id'>) => {
+        const newSubTask = {
+            id: subTasks.length > 0 ? subTasks[subTasks.length - 1].id + 1 : 1,
+            description, name, checked: false, taskId, result
+        };
 
-    return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;
+        postSubtask(newSubTask, token).then(() => (
+            setSubTasks((prevTodos) => [
+                ...prevTodos,
+                newSubTask
+            ])
+        ));
+    };
+
+    const markSubTask = (id: SubTask['id']) => {
+        const newSubTask = subTasks.map((subTask) => {
+            if (subTask.id === id)
+                return { ...subTask, checked: !subTask.checked }
+        }).filter(Boolean)[0];
+
+        if (newSubTask)
+            putSubtask(newSubTask, token).then(() => (
+                setSubTasks((prevTodos) =>
+                    prevTodos.map((subTask) => (subTask.id === id ? newSubTask : subTask))
+                )
+            ));
+
+    };
+
+    const markTask = (id: Task['id']) => {
+        const newTask = tasks.map((Task) => {
+            if (Task.id === id)
+                return { ...Task, checked: !Task.checked }
+        }).filter(Boolean)[0];
+
+        if (newTask)
+            putTask(newTask, token).then(() => (
+                setTasks((prevTodos) =>
+                    prevTodos.map((Task) => (Task.id === id ? newTask : Task))
+                )
+            ));
+
+    };
+
+    const deleteSubTask = (id: SubTask['id']) => {
+        setSubTasks((prevTodos) => prevTodos.filter((subTask) => subTask.id !== id));
+    };
+
+    const editSubTask = ({ name, description, result, taskId }: Omit<SubTask, 'checked' | 'id'>) => {
+        const newSubTask = subTasks.map((subTask) =>
+            subTask.id === subTasksIdForEdit ? { ...subTask, name, description, result, taskId } : subTask)[0];
+
+        if (newSubTask)
+            putSubtask(newSubTask, token).then(() => {
+                setSubTasks((prevTodos) =>
+                    prevTodos.map((subTask) =>
+                        subTask.id === subTasksIdForEdit ? newSubTask : subTask
+                    ));
+                    setSubTasksIdForEdit(null);
+            });
+    };
+
+const value = React.useMemo(
+    () => ({
+        tasks,
+        subTasks,
+        subTasksIdForEdit,
+        addSubTaskToTask,
+        deleteSubTask,
+        markSubTask,
+        markTask,
+        editSubTask,
+        selectSubTasksIdForEdit
+    }),
+    [tasks, subTasks, subTasksIdForEdit, addSubTaskToTask, deleteSubTask, editSubTask, markSubTask, markTask, selectSubTasksIdForEdit]
+);
+
+return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;
 };

@@ -4,19 +4,24 @@ import { TodoPanel } from "../TodoPanel/TodoPanel";
 import { useTodo } from "../../utils";
 
 export const TodoList: React.FC = () => {
-    const {todos, todoIdForEdit, checkTodo, deleteTodo, selectTodoIdForEdit} = useTodo();
+    const { subTasks, subTasksIdForEdit, markSubTask, deleteSubTask, selectSubTasksIdForEdit } = useTodo();
     return (
         <div>
-            {todos.map((todo) => {
-                if (todo.id === todoIdForEdit)
-                    return <TodoPanel mode='edit' editTodo={{ name: todo.name, description: todo.description }} />;
+            {subTasks.map((subTask) => {
+                if (subTask.id === subTasksIdForEdit)
+                    return <TodoPanel mode='edit' key={subTask.id} editSubTask={{
+                        name: subTask.name,
+                        description: subTask.description,
+                        result: subTask.result,
+                        taskId: subTask.taskId
+                    }} />;
                 return (
                     <TodoItem
-                        key={todo.id}
-                        todo={todo}
-                        deleteTodo={deleteTodo}
-                        checkTodo={checkTodo}
-                        selectTodoIdForEdit={selectTodoIdForEdit}
+                        key={subTask.id}
+                        subTask={subTask}
+                        deleteSubTask={deleteSubTask}
+                        markSubTask={markSubTask}
+                        selectSubTasksIdForEdit={selectSubTasksIdForEdit}
                     />
                 );
             })}
