@@ -88,7 +88,7 @@ class WorkersView(APIView):
             workers_list.append(WorkersSerializer({'id': worker.id,
                                                    'name': worker.name,
                                                    'surname': worker.surname,
-                                                   'patronymic': worker.patronumic,
+                                                   'patronymic': worker.patronymic,
                                                    'hr_id': worker.hr_id,
                                                    'jobTitle': worker.jobTitle,
                                                    'employmentDate': worker.employmentDate,
@@ -144,7 +144,7 @@ class WorkerView(APIView):
         if not pk:
             return Response({"error": "Method PUT not allowed"})
 
-        instance = Worker.objects.get(id=pk)
+        instance = Worker.objects.get(pk=pk)
 
         serializer = WorkerPutSerializer(data=request.data, instance=instance)
         serializer.is_valid(raise_exception=True)
