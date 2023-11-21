@@ -22,7 +22,7 @@ export const NavbarComponent: React.FC<NavbarComponentProps> = ({ homeUrl, navs 
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              {navs.map((nav) => (<Nav.Link to={nav.url} as={Link}>{nav.title}</Nav.Link>))}
+              {navs.map((nav, index) => (<Nav.Link key={index} to={nav.url} as={Link}>{nav.title}</Nav.Link>))}
             </Nav>
           </Navbar.Collapse>
         </div>

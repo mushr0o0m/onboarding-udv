@@ -1,29 +1,43 @@
 import React from "react";
 import { useState } from "react";
+import { authenticateUser, getUserType } from "./AuthenticateUser";
 
 export interface AuthContextProps {
-    user: null | string
-    signIn: (newUser: string, redirect: void) => void;
+    token: null | string;
+    signIn: (newUser: UserDate, redirect: (userType: string) => void) => void;
     signOut: (redirect: void) => void;
 }
 
 export const AuthContext = React.createContext<AuthContextProps>({
-    user: null,
-    signIn: () => {},
-    signOut: () => {}
+    token: null,
+    signIn: () => { },
+    signOut: () => { }
 });
 
 interface AuthProviderProps {
     children: React.ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = (({children}) => {
-    const [user, setUser] = useState<null | string>(null)
+interface UserDate {
+    email: string,
+    password: string
+}
+export const AuthProvider: React.FC<AuthProviderProps> = (({ children }) => {
+    const [token, setToken] = useState<string | null>(null)
 
-    
-    const signIn = (newUser: string, redirect: void) => {
-        setUser(newUser);
-        redirect;
+
+    const signIn = (newUser: UserDate, redirect: (userType: string) => void) => {
+        console.log(newUser);
+        authenticateUser(newUser)
+            .then((currentToken) => {
+                setToken(currentToken);
+                console.log('Token', currentToken);
+                return currentToken;
+            })
+            .then((currentToken) => {
+                return getUserType(currentToken)
+            })
+            .then((userType) => (redirect(userType)));
     }
 
     const signOut = (redirect: void) => {
@@ -31,11 +45,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = (({children}) => {
     }
 
     const value = {
-        signIn, signOut, user
-    } 
+        signIn, signOut, token
+    }
 
     return (
-    <AuthContext.Provider value={value}>
-        {children}
-    </AuthContext.Provider>)
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>)
 })

@@ -110,7 +110,7 @@ class Task(models.Model):
     is_completed = models.BooleanField()
 
     def __str__(self):
-        return self.text
+        return self.name
 
     def __int__(self):
         return self.id

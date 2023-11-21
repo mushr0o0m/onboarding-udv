@@ -43,7 +43,7 @@ export const HrStaffListPage: React.FC = () => {
       <TitlePageComponent titleName='Мои сотрудники' />
       <div className="container">
         {STAFF_LIST_EXAMPLE.map((staff) => (
-          <Card className='mb-3'>
+          <Card key={staff.id} className='mb-3'>
             <Card.Body >
               <div className="d-flex flex-nowrap align-items-center">
 

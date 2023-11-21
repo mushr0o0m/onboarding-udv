@@ -1,31 +1,34 @@
 import React, { useState } from 'react';
 import { Button, Form, Modal, Image } from 'react-bootstrap';
 import './CastomButtons.scss';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../utils/contextes/AuthContext/useAuth';
 
 export const AuthenticationPage: React.FC = () => {
 
 
-  const [userDetail, setUserDetail] = useState({ username: "", password: "" });
+  const [userDetail, setUserDetail] = useState({ email: "", password: "" });
   const [validatedForm, setValidatedForm] = useState<boolean | undefined>(undefined);
   const navigate = useNavigate();
-  const location = useLocation();
-  const {signIn} = useAuth();
-
-  const fromPage = location.state?.from?.pathname || '/';
+  const { signIn } = useAuth();
 
   const onSubmitData = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("called", userDetail);
     setValidatedForm(true);
-    if(event.currentTarget.checkValidity()){
-      signIn(`${userDetail.username} ${userDetail.password}`, navigate("/hr"))
+    if (event.currentTarget.checkValidity()) {
+      const user = {
+        email: userDetail.email,
+        password: userDetail.password
+      }
+      console.log('input', userDetail)
+      signIn(user, (userType) => navigate(userType === 'HR' ? "/hr" : '/apprentice'))
     }
   };
 
   const onValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    
     setUserDetail({ ...userDetail, [e.target.name]: e.target.value });
+    console.log(userDetail)
     // setValidatedForm(true);
   };
 
@@ -49,11 +52,11 @@ export const AuthenticationPage: React.FC = () => {
             <Modal.Body className='p-4 pb-0'>
               <Form.Group className="mb-3" controlId="login">
                 <Form.Label>Логин</Form.Label>
-                <Form.Control value={userDetail.username}
+                <Form.Control value={userDetail.email}
                   type="email"
                   required
                   onChange={onValueChange}
-                  name="username" />
+                  name="email" />
               </Form.Group>
               <Form.Group className="mb-3" controlId="password">
                 <Form.Label>Пароль</Form.Label>

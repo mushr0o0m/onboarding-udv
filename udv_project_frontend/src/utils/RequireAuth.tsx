@@ -8,11 +8,10 @@ interface RequireAuthProps{
 
 export const RequireAuth: React.FC<RequireAuthProps> = ({children}) => {
     const location = useLocation();
-    const {user} = useAuth();
-    if (!user){
+    const {token} = useAuth();
+    if (!token || token == ""){
         return <Navigate to='/' state={{from: location}}/>
     }
-    
     return (
         children
     )
