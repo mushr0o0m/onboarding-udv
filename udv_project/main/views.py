@@ -17,7 +17,7 @@ class TasksView(APIView):
             subtasks_list = []
             subtasks = Subtask.objects.filter(task_id=task.id)
             for subtask in subtasks:
-                subtasks_list.append(SubtaskSerializer(subtask).data)
+                subtasks_list.append(SubtaskReadSerializer(subtask).data)
             task_dict = {'id': task.id,
                          'worker_id': task.worker_id,
                          'name': task.name,
@@ -30,8 +30,8 @@ class TasksView(APIView):
     def post(self, request):
         serializer = SubtaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({'post': serializer.data})
+        inst = serializer.save()
+        return Response({'post': serializer.data, 'subtask_id': inst.id})
 
     def put(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
@@ -76,7 +76,7 @@ class WorkersView(APIView):
                 subtasks_list = []
                 subtasks = Subtask.objects.filter(task_id=task.id)
                 for subtask in subtasks:
-                    subtasks_list.append(SubtaskSerializer(subtask).data)
+                    subtasks_list.append(SubtaskReadSerializer(subtask).data)
                 task_dict = {'id': task.id,
                              'worker_id': task.worker_id,
                              'name': task.name,
@@ -118,7 +118,7 @@ class WorkerView(APIView):
             subtasks_list = []
             subtasks = Subtask.objects.filter(task_id=task.id)
             for subtask in subtasks:
-                subtasks_list.append(SubtaskSerializer(subtask).data)
+                subtasks_list.append(SubtaskReadSerializer(subtask).data)
             task_dict = {'id': task.id,
                          'worker_id': task.worker_id,
                          'name': task.name,

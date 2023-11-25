@@ -3,7 +3,6 @@ from .models import *
 
 
 class SubtaskSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
     task_id = serializers.SlugRelatedField(queryset=Task.objects.all(), slug_field='id')
     name = serializers.CharField()
     result = serializers.CharField()
@@ -13,7 +12,6 @@ class SubtaskSerializer(serializers.Serializer):
         return Subtask.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.id = validated_data.get("id", instance.id)
         instance.task_id = validated_data.get("task_id", instance.task_id)
         instance.name = validated_data.get("name", instance.name)
         instance.result = validated_data.get("result", instance.result)
@@ -22,9 +20,17 @@ class SubtaskSerializer(serializers.Serializer):
         return instance
 
 
+class SubtaskReadSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    task_id = serializers.SlugRelatedField(queryset=Task.objects.all(), slug_field='id')
+    name = serializers.CharField()
+    result = serializers.CharField()
+    is_completed = serializers.BooleanField()
+
+
 class TasksSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    worker_id = serializers.IntegerField()
+    # worker_id = serializers.IntegerField()
     name = serializers.CharField()
     result = serializers.CharField()
     is_completed = serializers.BooleanField()
