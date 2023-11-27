@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 
-class TasksView(APIView):
+class TasksListView(APIView):
     def get(self, request):
         worker = Worker.objects.get(user_id=request.user.id)
         tasks = Task.objects.filter(worker_id=worker.id)
@@ -24,7 +24,7 @@ class TasksView(APIView):
                          'result': task.result,
                          'is_completed': task.is_completed,
                          'subtasks': subtasks_list}
-            tasks_list.append(TasksSerializer(task_dict).data)
+            tasks_list.append(TasksListSerializer(task_dict).data)
         return Response({'tasks': tasks_list})
 
     def post(self, request):
@@ -61,7 +61,7 @@ class TasksView(APIView):
         return Response({'delete': 'ok'})
 
 
-class WorkersView(APIView):
+class WorkerListView(APIView):
     def get(self, request):
         hr = Hr.objects.get(user_id=request.user.id)
         workers = Worker.objects.filter(hr_id=hr.id)
@@ -83,7 +83,7 @@ class WorkersView(APIView):
                              'result': task.result,
                              'is_completed': task.is_completed,
                              'subtasks': subtasks_list}
-                tasks_list.append(TasksSerializer(task_dict).data)
+                tasks_list.append(TasksListSerializer(task_dict).data)
 
             workers_list.append(WorkersSerializer({'id': worker.id,
                                                    'name': worker.name,
@@ -125,7 +125,7 @@ class WorkerView(APIView):
                          'result': task.result,
                          'is_completed': task.is_completed,
                          'subtasks': subtasks_list}
-            tasks_list.append(TasksSerializer(task_dict).data)
+            tasks_list.append(TasksListSerializer(task_dict).data)
 
         return Response({'worker': WorkersSerializer({'id': worker.id,
                                                       'name': worker.name,
@@ -165,15 +165,15 @@ class WorkerView(APIView):
         return Response({'delete': 'ok'})
 
 
-class OnlyTasksView(APIView):
+class TaskView(APIView):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
         worker = Worker.objects.get(pk=pk)
         tasks = Task.objects.filter(worker_id=worker.id)
-        return Response({'tasks': OnlyTasksReadSerializer(tasks, many=True).data})
+        return Response({'tasks': TasksReadSerializer(tasks, many=True).data})
 
     def post(self, request):
-        serializer = OnlyTasksSerializer(data=request.data)
+        serializer = TasksSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'post': serializer.data})
@@ -185,7 +185,7 @@ class OnlyTasksView(APIView):
 
         instance = Task.objects.get(pk=pk)
 
-        serializer = OnlyTasksSerializer(data=request.data, instance=instance)
+        serializer = TasksSerializer(data=request.data, instance=instance)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'post': serializer.data})

@@ -25,11 +25,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
-    path('api/tasklist/', TasksView.as_view()),
-    path('api/tasklist/<int:pk>/', TasksView.as_view()),
-    path('api/workers/', WorkersView.as_view()),
+    path('api/tasklist/', TasksListView.as_view()),
+    path('api/tasklist/<int:pk>/', TasksListView.as_view()),
+    path('api/workerlist/', WorkerListView.as_view()),
     path('api/who/', WhoView.as_view()),
     path('api/worker/<int:pk>/', WorkerView.as_view()),
-    path('api/tasks/', OnlyTasksView.as_view()),
-    path('api/tasks/<int:pk>/', OnlyTasksView.as_view())
+    path('api/tasks/', TaskView.as_view()),
+    path('api/tasks/<int:pk>/', TaskView.as_view())
 ]

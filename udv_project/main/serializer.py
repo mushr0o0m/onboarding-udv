@@ -28,7 +28,7 @@ class SubtaskReadSerializer(serializers.Serializer):
     is_completed = serializers.BooleanField()
 
 
-class TasksSerializer(serializers.Serializer):
+class TasksListSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     # worker_id = serializers.IntegerField()
     name = serializers.CharField()
@@ -69,7 +69,7 @@ class WorkerPutSerializer(serializers.Serializer):
         return instance
 
 
-class OnlyTasksSerializer(serializers.Serializer):
+class TasksSerializer(serializers.Serializer):
     worker_id = serializers.SlugRelatedField(queryset=Worker.objects.all(), slug_field='id')
     name = serializers.CharField()
     result = serializers.CharField()
@@ -87,7 +87,7 @@ class OnlyTasksSerializer(serializers.Serializer):
         return instance
 
 
-class OnlyTasksReadSerializer(serializers.Serializer):
+class TasksReadSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     worker_id = serializers.IntegerField()
     name = serializers.CharField()
