@@ -31,5 +31,6 @@ urlpatterns = [
     path('api/who/', WhoView.as_view()),
     path('api/worker/<int:pk>/', WorkerView.as_view()),
     path('api/tasks/', TaskView.as_view()),
-    path('api/tasks/<int:pk>/', TaskView.as_view())
+    path('api/tasks/<int:pk>/', TaskView.as_view()),
+    path('api/name/', NameUser.as_view())
 ]

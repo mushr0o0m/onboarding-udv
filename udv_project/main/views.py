@@ -202,3 +202,17 @@ class TaskView(APIView):
         instance = Task.objects.get(pk=pk)
         instance.delete()
         return Response({'delete': 'ok'})
+
+
+class NameUser(APIView):
+    def get(self, request, *args, **kwargs):
+        user = User.objects.get(id=request.user.id)
+        if user.who == 'WR':
+            worker = Worker.objects.get(user_id=user.id)
+            return Response({'name': worker.name,
+                             'surname': worker.surname,
+                             'patronymic': worker.patronymic})
+        else:
+            hr = Hr.objects.get(user_id=user.id)
+            return Response({'name': hr.name})
+
