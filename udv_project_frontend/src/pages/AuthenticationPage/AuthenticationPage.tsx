@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Button, Form, Modal, Image } from 'react-bootstrap';
 import './CastomButtons.scss';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../utils/contextes/AuthContext/useAuth';
+import { useAuth } from '../../utils';
+
 
 export const AuthenticationPage: React.FC = () => {
 
@@ -20,7 +21,6 @@ export const AuthenticationPage: React.FC = () => {
         email: userDetail.email,
         password: userDetail.password
       }
-      console.log('input', userDetail)
       signIn(user, (userType) => navigate(userType === 'HR' ? "/hr" : '/apprentice'))
     }
   };
@@ -62,7 +62,7 @@ export const AuthenticationPage: React.FC = () => {
                 <Form.Label>Пароль</Form.Label>
                 <Form.Control value={userDetail.password}
                   type="password"
-                  minLength={8}
+                  // minLength={8}
                   maxLength={12}
                   required
                   name="password"

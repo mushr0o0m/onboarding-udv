@@ -2,8 +2,6 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 import { SubtaskManagerModal } from './SubtaskManagerModal';
 
-// interface BtnControllerProps {
-// }
 
 export const BtnController: React.FC = () => {
   const [modalShow, setModalShow] = React.useState(false);

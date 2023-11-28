@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { TodoContext } from './TodoContext';
-import { getSubtaskList, getTaskList, postSubtask, putSubtask, putTask } from '../requests/TodoRequests';
-import { useAuth } from './AuthContext/useAuth';
+import { getSubtaskList, getTaskList, postSubtask, putSubtask, putTask } from '../../requests/TodoRequests';
+import { useAuth } from '../AuthContext/useAuth';
 
 interface TodoProviderProps {
     children: React.ReactNode;

@@ -22,7 +22,8 @@ export const AppRouter: React.FC = () => {
         <Route path="apprentice" element={
           <RequireAuth>
             <ApprenticeMainPage />
-          </RequireAuth>} >
+          </RequireAuth>
+        } >
           <Route index element={<ApprenticeTodoPage />} />
           <Route path="education" element={<ApprenticeEducationPage />} />
           <Route path="office" element={<ApprenticeOfficePage />} />

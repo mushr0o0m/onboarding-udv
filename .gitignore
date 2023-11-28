@@ -161,5 +161,4 @@ build/
 manage.py
 .DS_Store
 
-# example database
-drf_example
+**/migrations/

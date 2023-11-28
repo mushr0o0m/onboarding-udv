@@ -41,3 +41,19 @@ export const getUserType = async (token: string | Promise<string>): Promise<stri
         throw error;
     }
 };
+
+export const logoutUser = async (token: string | Promise<string>) => {
+    try {
+        console.log(token)
+        await axios.post(`${apiUrl}/auth/token/logout/`, {}, {
+            headers: {
+                Authorization: `Token ${token}`,
+            },
+        });
+
+    } catch (error) {
+        console.error('Logout Error:',
+            (error as AxiosError)?.response?.data || (error as Error).message);
+        throw error;
+    }
+};

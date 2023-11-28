@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { NavbarComponent } from '../../../components/NavbarComponent';
+import { NavbarComponent } from '../../../components/Navbar/NavbarComponent';
 
 export const ApprenticeMainPage: React.FC = () => {
 
