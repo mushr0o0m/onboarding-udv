@@ -5,7 +5,7 @@ import { ApprenticeMainPage } from '../pages/ApprenticePages/ApprenticeMainPage/
 import { ApprenticeEducationPage } from '../pages/ApprenticePages/ApprenticeEducationPage/ApprenticeEducationPage';
 import { ApprenticeOfficePage } from '../pages/ApprenticePages/ApprenticeOfficePage/ApprenticeOfficePage';
 import { ApprenticeTodoPage } from '../pages/ApprenticePages/ApprenticeTodoPage/ApprenticeTodoPage';
-import { HrStaffListPage } from '../pages/HrPages/HrStaffListPage';
+import { HrStaffListPage } from '../pages/HrPages/HrStaffList/HrStaffListPage';
 import { HrStaffProfile } from '../pages/HrPages/HrStaffProfile';
 import { HrStaffProfileManager } from '../pages/HrPages/HrStaffProfileManager';
 import { HrWrapperPage } from '../pages/HrPages/HrWrapperPage';

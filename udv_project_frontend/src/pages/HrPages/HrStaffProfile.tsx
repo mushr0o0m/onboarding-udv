@@ -3,19 +3,7 @@ import { TitlePageComponent } from '../../components/TitlePageComponent';
 import { Button, ListGroup } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DeleteConfirmationDialog } from '../../components/DeleteConfirmationDialog';
-
-const STAFF_EXAMPLE = {
-  id: 0, name: 'Kirill',
-  surname: 'Filonik',
-  patronymic: 'Ruslanovich',
-  employmentDate: new Date(2023, 10, 19),
-  jobTitle: 'Front-end developer', email: 'kirill@email.com',
-  tasks: [
-    { id: 1, name: 'Task 1', checked: false },
-    { id: 2, name: 'Task 2', checked: false },
-    { id: 3, name: 'Task 3', checked: true }
-  ]
-}
+import { useHrStaff } from '../../utils';
 
 export const HrStaffProfile: React.FC = () => {
 
@@ -23,14 +11,7 @@ export const HrStaffProfile: React.FC = () => {
   const employer = STAFF_EXAMPLE;
   const navigate = useNavigate();
   const { id } = useParams();
-
-  const getFormatedDate = (date: Date) => { //Убрать в UseContext
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-
-    return `${day}.${month}.${year}`;
-  }
+  const { getFormatedDate } = useHrStaff();
 
   const onDelete = (() => { //Убрать в UseContext
     navigate("/hr");
@@ -74,14 +55,14 @@ export const HrStaffProfile: React.FC = () => {
         <div className="d-flex justify-content-between">
           <Button className='btn-lg' onClick={() => setModalShow(true)} variant='danger'>Завершить адаптационный период</Button>
           <div>
-          <Button className='btn-lg me-3' onClick={() => (navigate(`/hr`))} variant='secondary'>Вернуться</Button>
-          <Button className='btn-lg' onClick={() => (navigate(`/hr/staff/${id}/edit`))} variant='bd-primary'>Редактировать</Button>
+            <Button className='btn-lg me-3' onClick={() => (navigate(`/hr`))} variant='secondary'>Вернуться</Button>
+            <Button className='btn-lg' onClick={() => (navigate(`/hr/staff/${id}/edit`))} variant='bd-primary'>Редактировать</Button>
           </div>
-          
+
         </div>
         <DeleteConfirmationDialog
-            show={modalShow}
-            onHide={() => setModalShow(false)} onDelete={() => (onDelete())} />
+          show={modalShow}
+          onHide={() => setModalShow(false)} onDelete={() => (onDelete())} />
       </section>
     </>
   );
