@@ -54,12 +54,12 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
             description, name, checked: false, taskId, result
         };
 
-        postSubtask(newSubTask, token).then(() => (
-            setSubTasks((prevTodos) => [
+        postSubtask(newSubTask, token)
+            .then(() => (setSubTasks((prevTodos) => [
                 ...prevTodos,
                 newSubTask
             ])
-        ));
+            ));
     };
 
     const markSubTask = (id: SubTask['id']) => {
@@ -106,24 +106,24 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
                     prevTodos.map((subTask) =>
                         subTask.id === subTasksIdForEdit ? newSubTask : subTask
                     ));
-                    setSubTasksIdForEdit(null);
+                setSubTasksIdForEdit(null);
             });
     };
 
-const value = React.useMemo(
-    () => ({
-        tasks,
-        subTasks,
-        subTasksIdForEdit,
-        addSubTaskToTask,
-        deleteSubTask,
-        markSubTask,
-        markTask,
-        editSubTask,
-        selectSubTasksIdForEdit
-    }),
-    [tasks, subTasks, subTasksIdForEdit, addSubTaskToTask, deleteSubTask, editSubTask, markSubTask, markTask, selectSubTasksIdForEdit]
-);
+    const value = React.useMemo(
+        () => ({
+            tasks,
+            subTasks,
+            subTasksIdForEdit,
+            addSubTaskToTask,
+            deleteSubTask,
+            markSubTask,
+            markTask,
+            editSubTask,
+            selectSubTasksIdForEdit
+        }),
+        [tasks, subTasks, subTasksIdForEdit, addSubTaskToTask, deleteSubTask, editSubTask, markSubTask, markTask, selectSubTasksIdForEdit]
+    );
 
-return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;
+    return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;
 };

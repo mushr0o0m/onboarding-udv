@@ -6,7 +6,7 @@ import { DeleteConfirmationDialog } from '../../../../components/DeleteConfirmat
 interface StaffCardProps {
   employee: Employee;
   formatedEmploymentDate: string | null;
-  onDelete: () => void;
+  onDelete: (id: Employee['id']) => void;
 }
 
 export const StaffCard: React.FC<StaffCardProps> = ({ employee, formatedEmploymentDate, onDelete }) => {
@@ -34,7 +34,7 @@ export const StaffCard: React.FC<StaffCardProps> = ({ employee, formatedEmployme
             <CloseButton onClick={() => setModalShow(true)} />
             <DeleteConfirmationDialog
               show={modalShow}
-              onHide={() => setModalShow(false)} onDelete={() => (onDelete())} />
+              onHide={() => setModalShow(false)} onDelete={() => (onDelete(employee.id))} />
           </div>
 
         </div>

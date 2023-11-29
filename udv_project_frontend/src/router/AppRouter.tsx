@@ -7,7 +7,7 @@ import { ApprenticeOfficePage } from '../pages/ApprenticePages/ApprenticeOfficeP
 import { ApprenticeTodoPage } from '../pages/ApprenticePages/ApprenticeTodoPage/ApprenticeTodoPage';
 import { HrStaffListPage } from '../pages/HrPages/HrStaffList/HrStaffListPage';
 import { HrStaffProfile } from '../pages/HrPages/HrStaffProfile';
-import { HrStaffProfileManager } from '../pages/HrPages/HrStaffProfileManager';
+import { HrStaffProfileManager } from '../pages/HrPages/HrStaffProfileManager/HrStaffProfileManager';
 import { HrWrapperPage } from '../pages/HrPages/HrWrapperPage';
 import { HrProjectsPage } from '../pages/HrPages/HrProjectsPage';
 import { RequireAuth } from '../utils/RequireAuth';

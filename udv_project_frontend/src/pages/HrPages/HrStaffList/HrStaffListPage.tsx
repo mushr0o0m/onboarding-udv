@@ -9,12 +9,12 @@ export const HrStaffListPage: React.FC = () => {
 
 
   const [searchQuery, setSearchQuery] = React.useState('');
-  const { staff, getFormatedDate } = useHrStaff();
+  const { staff, getFormatedDate, deleteEmployee } = useHrStaff();
   const [filteredStaff, setFilteredStaff] = React.useState(staff);
   const [noResults, setNoResults] = React.useState(false);
 
-  const onDelete = (() => {
-    console.log('Delete');
+  const onDelete = ((id: Employee['id']) => {
+    deleteEmployee(id);
   })
 
   React.useEffect(() => {

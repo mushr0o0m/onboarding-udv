@@ -8,16 +8,20 @@ import { useHrStaff } from '../../utils';
 export const HrStaffProfile: React.FC = () => {
 
   const [modalShow, setModalShow] = React.useState(false);
-  const employer = STAFF_EXAMPLE;
   const navigate = useNavigate();
   const { id } = useParams();
-  const { getFormatedDate } = useHrStaff();
+  const { staff, getFormatedDate, deleteEmployee } = useHrStaff();
+  const employer = staff.filter((employee) => (id && employee.id === parseInt(id)))[0];
 
-  const onDelete = (() => { //Убрать в UseContext
+  
+  const onDelete = (() => { 
+    deleteEmployee(employer.id);
     navigate("/hr");
-    console.log('Delete');
   })
-
+  
+  if (!employer)
+    return <p>Сотрудник не найден.</p>
+  
   return (
     <>
       <TitlePageComponent titleName='Профиль сотрудника' />
@@ -41,14 +45,14 @@ export const HrStaffProfile: React.FC = () => {
         <div className='mb-5'>
           <h4 className='mb-3'>Критерии завершения адаптационного периода:</h4>
           <ListGroup>
-            {employer.tasks.map((task) => (
+            {employer.tasks ? employer.tasks.map((task: Task) => (
               <ListGroup.Item
                 disabled={task.checked}
                 style={{ textDecoration: task.checked ? 'line-through' : 'none' }}
                 key={task.id}>
                 {task.name}
               </ListGroup.Item>
-            ))}
+            )) : <p>У сотрудника нет критериев АП.</p>}
           </ListGroup>
         </div>
 

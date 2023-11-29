@@ -53,15 +53,20 @@ export const HrStaffProvider: React.FC<HrStaffProviderProps> = (({ children }) =
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
-    
+
         return `${day}.${month}.${year}`;
-      }
+    }
+
+    const deleteEmployee = (id: Employee['id']) => {
+        setStaff((prevEmployee) => prevEmployee.filter((employee) => employee.id !== id));
+    };
 
 
     const value = React.useMemo(
         () => ({
             staff,
             getFormatedDate,
+            deleteEmployee,
         }),
         [staff, getFormatedDate]
     );
