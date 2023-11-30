@@ -93,3 +93,9 @@ class TasksReadSerializer(serializers.Serializer):
     name = serializers.CharField()
     result = serializers.CharField()
     is_completed = serializers.BooleanField()
+
+
+class UserSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    email = serializers.CharField()
+    who = serializers.CharField()

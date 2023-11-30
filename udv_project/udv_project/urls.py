@@ -22,15 +22,27 @@ from main.views import *
 from rest_framework import routers
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/auth/', include('djoser.urls')),
-    re_path(r'^auth/', include('djoser.urls.authtoken')),
-    path('api/tasklist/', TasksListView.as_view()),
-    path('api/tasklist/<int:pk>/', TasksListView.as_view()),
-    path('api/workerlist/', WorkerListView.as_view()),
-    path('api/who/', WhoView.as_view()),
-    path('api/worker/<int:pk>/', WorkerView.as_view()),
-    path('api/tasks/', TaskView.as_view()),
-    path('api/tasks/<int:pk>/', TaskView.as_view()),
-    path('api/name/', NameUser.as_view())
+    path('admin/', admin.site.urls),  # админ панель целиком
+    path('api/auth/', include('djoser.urls')),  # авторизация
+    re_path(r'^auth/', include('djoser.urls.authtoken')),  # авторизация
+
+    path('api/tasklist/', TasksListView.as_view()),  # get - возвращает список tasks со вложенными subtasks для worker
+                                                     # по токену
+                                                     # post - создаёт subtask
+    path('api/tasklist/<int:pk>/', TasksListView.as_view()),  # put/delete - изменение/удаление subtask по subtask id
+
+    path('api/workerlist/', WorkerListView.as_view()),  # get - возвращает список workers о всеми влложениями
+                                                        # для hr по токену
+
+    path('api/who/', WhoView.as_view()),  # get - возвращает поле who юзера
+    path('api/worker/', WorkerView.as_view()),  # post - создание user и соответственно worker
+
+    path('api/worker/<int:pk>/', WorkerView.as_view()),  # get/put/delete -  возвращает/изменяет/удаляет конкретного
+                                                         # worker по worker id
+
+    path('api/tasks/', TaskView.as_view()),  # post - создание task
+    path('api/tasks/<int:pk>/', TaskView.as_view()),  # get - возвращает список tasks без subtasks для worker id
+                                                      # put/delete - изменение/удаление task по task id
+
+    path('api/name/', NameUser.as_view())  # get - возвращает ФИО или только имя по токену. Работает для hr и worker
 ]
