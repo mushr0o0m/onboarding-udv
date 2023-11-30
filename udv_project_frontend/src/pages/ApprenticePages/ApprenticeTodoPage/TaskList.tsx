@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
-import { useTodo } from '../../../utils';
 import { SubTaskList } from './SubTaskList';
+import { useTodo } from '../../../utils';
 
 
 export const TaskList: React.FC = () => {

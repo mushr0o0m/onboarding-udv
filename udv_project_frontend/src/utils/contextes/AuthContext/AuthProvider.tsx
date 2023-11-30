@@ -1,11 +1,11 @@
 import React from "react";
 import { useState } from "react";
-import { authenticateUser, getUserType } from "./AuthenticateUser";
+import { authenticateUser, getUserType, logoutUser } from "./AuthenticateUser";
 
 export interface AuthContextProps {
     token: null | string;
     signIn: (newUser: UserDate, redirect: (userType: string) => void) => void;
-    signOut: (redirect: void) => void;
+    signOut: (token: string, redirect: () => void) => void;
 }
 
 export const AuthContext = React.createContext<AuthContextProps>({
@@ -23,11 +23,11 @@ interface UserDate {
     password: string
 }
 export const AuthProvider: React.FC<AuthProviderProps> = (({ children }) => {
+
     const [token, setToken] = useState<string | null>(null)
 
 
     const signIn = (newUser: UserDate, redirect: (userType: string) => void) => {
-        console.log(newUser);
         authenticateUser(newUser)
             .then((currentToken) => {
                 setToken(currentToken);
@@ -40,8 +40,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = (({ children }) => {
             .then((userType) => (redirect(userType)));
     }
 
-    const signOut = (redirect: void) => {
-        redirect;
+    const signOut = (token: string, redirect: () => void) => {
+        if (token)
+            logoutUser(token)
+                .then(() => setToken(null))
+                .then(() => (redirect()));
     }
 
     const value = {
