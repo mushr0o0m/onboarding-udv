@@ -116,7 +116,7 @@ class WorkerView(APIView):
         worker.surname = data['surname']
         worker.patronymic = data['patronymic']
         worker.jobTitle = data['jobTitle']
-        worker.employmentDate = data['employmentDate'][:10]
+        worker.employmentDate = data['employmentDate'][:10].replace('.', '-')
         worker.hr_id = Hr.objects.get(user_id=request.user.id)
         worker.save()
 
