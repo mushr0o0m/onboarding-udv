@@ -123,10 +123,9 @@ class WorkerView(APIView):
         tasklist = []
         tasks = data['tasks']
         for task in tasks:
-            tasklist.append(TasksSerializer(Task.objects.create(worker_id=worker,
-                                                                name=task['name'],
-                                                                result=task['result'],
-                                                                is_completed=False)).data)
+            tasklist.append(TasksReadSerializer(Task.objects.create(worker_id=worker,
+                                                                    name=task['name'],
+                                                                    is_completed=False)).data)
 
         return Response({'worker': WorkersSerializer({'id': worker.id,
                                                       'name': worker.name,

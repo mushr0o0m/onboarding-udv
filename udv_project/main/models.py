@@ -106,7 +106,6 @@ class Worker(models.Model):
 class Task(models.Model):
     worker_id = models.ForeignKey(Worker, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
-    result = models.CharField(max_length=100)
     is_completed = models.BooleanField()
 
     def __str__(self):
