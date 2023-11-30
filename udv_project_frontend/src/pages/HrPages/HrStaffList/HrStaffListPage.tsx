@@ -44,9 +44,10 @@ export const HrStaffListPage: React.FC = () => {
         <StaffSearch handleSearchChange={handleSearchChange} searchQuery={searchQuery} />
         {noResults && <p>Пользователь не найден.</p>}
         {filteredStaff.map((employee) => <StaffCard
+          key={employee.id}
           onDelete={onDelete}
           employee={employee}
-          formatedEmploymentDate={getFormatedDate(employee.employmentDate)} />)}
+          formatedEmploymentDate={getFormatedDate(employee.employmentDate, 'dd-MM-yyyy')} />)}
       </div>
     </>
 

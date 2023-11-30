@@ -32,7 +32,7 @@ export const HrStaffProfile: React.FC = () => {
             <h5 className='d-inline text-secondary'>{employer.jobTitle}</h5>
           </div>
           <div className='text-end  text-secondary'>
-            <p className='mb-2'>Дата устройства:</p> {getFormatedDate(employer.employmentDate)}
+            <p className='mb-2'>Дата устройства:</p> {getFormatedDate(employer.employmentDate, 'dd-MM-yyyy')}
           </div>
         </div>
 

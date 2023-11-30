@@ -12,8 +12,9 @@ export const AdaptationCriteriaList: React.FC<AdaptationCriteriaListProps> = ({ 
 
     return (
         <ListGroup>
-            {tasks.map((task) => (
+            {tasks.map((task, index) => (
                 <ListGroup.Item
+                    key={index}
                     style={{ textDecoration: task.checked ? 'line-through' : 'none' }}
                     disabled
                 >{task.name}</ListGroup.Item>

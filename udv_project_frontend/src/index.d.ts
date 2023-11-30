@@ -17,10 +17,11 @@ type Employee = {
   id: number;
   name: string;
   surname: string;
-  patronymic: string | null;
+  patronymic?: string;
   employmentDate: Date;
   jobTitle: string;
   email: string;
-  tasks: Task[] | null;
+  telegramm?: string;
+  tasks: Task[];
 }
 
