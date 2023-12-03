@@ -106,6 +106,40 @@ class WhoView(APIView):
 
 
 class WorkerView(APIView):
+
+    def post(self, request):
+        data = request.data
+        user = User.objects.create_user(email=data['email'], password='Postupila_000')
+        worker = Worker.objects.get(user_id=user.id)
+
+        worker.name = data['name']
+        worker.surname = data['surname']
+        worker.patronymic = data['patronymic']
+        worker.jobTitle = data['jobTitle']
+        worker.employmentDate = data['employmentDate'][:10].replace('.', '-')
+        worker.hr_id = Hr.objects.get(user_id=request.user.id)
+        worker.save()
+
+        tasklist = []
+        tasks = data['tasks']
+        for task in tasks:
+            tasklist.append(TasksReadSerializer(Task.objects.create(worker_id=worker,
+                                                                    name=task['name'],
+                                                                    is_completed=False)).data)
+
+        return Response({'worker': WorkersSerializer({'id': worker.id,
+                                                      'name': worker.name,
+                                                      'surname': worker.surname,
+                                                      'patronymic': worker.patronymic,
+                                                      'hr_id': worker.hr_id,
+                                                      'jobTitle': worker.jobTitle,
+                                                      'employmentDate': worker.employmentDate,
+                                                      'email': user.email,
+                                                      'user_id': user.id,
+                                                      'tasks': tasklist
+                                                      }).data
+                         })
+
     def get(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
         worker = Worker.objects.get(id=pk)
@@ -133,7 +167,7 @@ class WorkerView(APIView):
                                                       'patronymic': worker.patronymic,
                                                       'hr_id': hr.id,
                                                       'jobTitle': worker.jobTitle,
-                                                     'employmentDate': worker.employmentDate,
+                                                      'employmentDate': worker.employmentDate,
                                                       'email': user.email,
                                                       'user_id': user.id,
                                                       'tasks': tasks_list
@@ -215,4 +249,3 @@ class NameUser(APIView):
         else:
             hr = Hr.objects.get(user_id=user.id)
             return Response({'name': hr.name})
-
