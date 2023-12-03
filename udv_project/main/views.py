@@ -21,7 +21,6 @@ class TasksListView(APIView):
             task_dict = {'id': task.id,
                          'worker_id': task.worker_id,
                          'name': task.name,
-                         'result': task.result,
                          'is_completed': task.is_completed,
                          'subtasks': subtasks_list}
             tasks_list.append(TasksListSerializer(task_dict).data)
