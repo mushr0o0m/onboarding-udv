@@ -46,6 +46,16 @@ class TasksListView(APIView):
         serializer.save()
         return Response({'post': serializer.data})
 
+    def patch(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method PATCH not allowed"})
+        instance = Subtask.objects.get(pk=pk)
+        instance.is_completed = bool(request.data['is_completed'])
+        instance.save()
+
+        return Response({'post': SubtaskSerializer(instance).data})
+
     def delete(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
         if not pk:
@@ -77,9 +87,7 @@ class WorkerListView(APIView):
                 for subtask in subtasks:
                     subtasks_list.append(SubtaskReadSerializer(subtask).data)
                 task_dict = {'id': task.id,
-                             'worker_id': task.worker_id,
                              'name': task.name,
-                             'result': task.result,
                              'is_completed': task.is_completed,
                              'subtasks': subtasks_list}
                 tasks_list.append(TasksListSerializer(task_dict).data)
@@ -223,7 +231,17 @@ class TaskView(APIView):
         serializer = TasksSerializer(data=data, instance=instance)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({'put': serializer.data})
+        return Response({'post': serializer.data})
+
+    def patch(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method PATCH not allowed"})
+        instance = Task.objects.get(pk=pk)
+        instance.is_completed = bool(request.data['is_completed'])
+        instance.save()
+
+        return Response({'post': TasksSerializer(instance).data})
 
     def delete(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
