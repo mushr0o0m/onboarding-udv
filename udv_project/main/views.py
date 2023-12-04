@@ -184,7 +184,6 @@ class WorkerView(APIView):
             task_dict = {'id': task.id,
                          'worker_id': task.worker_id,
                          'name': task.name,
-                         'result': task.result,
                          'is_completed': task.is_completed,
                          'subtasks': subtasks_list}
             tasks_list.append(TasksListSerializer(task_dict).data)
@@ -223,7 +222,9 @@ class WorkerView(APIView):
             return Response({"error": "Object does not exists"})
 
         instance = Worker.objects.get(id=pk)
+        user = User.objects.get(id=instance.user_id)
         instance.delete()
+        user.delete()
         return Response({'delete': 'ok'})
 
 
