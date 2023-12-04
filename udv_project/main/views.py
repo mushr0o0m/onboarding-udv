@@ -5,6 +5,9 @@ from .serializer import *
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from django.conf import settings
+from django.core.mail import send_mail
+from password_generator import PasswordGenerator
 
 
 class TasksListView(APIView):
@@ -116,7 +119,25 @@ class WorkerView(APIView):
 
     def post(self, request):
         data = request.data
-        user = User.objects.create_user(email=data['email'], password='Postupila_000')
+        hr = Hr.objects.get(user_id=request.user.id)
+
+        pwo = PasswordGenerator()
+        pwo.minlen = 8
+        pwo.maxlen = 8
+        pwo.minuchars = 2
+        pwo.minlchars = 4
+        pwo.minnumbers = 1
+        pwo.minschars = 1
+        password = pwo.generate()
+
+        user = User.objects.create_user(email=data['email'], password=password)
+
+        send_mail('Регистрация на сервисе для онбординга UDV',
+                  'Похоже вы недавно устроились на работу в UDV, поздравляем! Ваш Hr, ' + str(hr.name) +
+                  ' уже вас зарегистрировал(а). Переходите скорее в сервис \nВаш пароль: ' + str(password) + '.',
+                  settings.EMAIL_HOST_USER,
+                  [data['email']])
+
         worker = Worker.objects.get(user_id=user.id)
 
         worker.name = data['name']
@@ -124,7 +145,7 @@ class WorkerView(APIView):
         worker.patronymic = data['patronymic']
         worker.jobTitle = data['jobTitle']
         worker.employmentDate = data['employmentDate'][:10].replace('.', '-')
-        worker.hr_id = Hr.objects.get(user_id=request.user.id)
+        worker.hr_id = hr
         worker.save()
 
         tasklist = []
