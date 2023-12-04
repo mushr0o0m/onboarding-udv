@@ -5,6 +5,7 @@ from .models import *
 class SubtaskSerializer(serializers.Serializer):
     task_id = serializers.SlugRelatedField(queryset=Task.objects.all(), slug_field='id')
     name = serializers.CharField()
+    description = serializers.CharField()
     result = serializers.CharField()
     is_completed = serializers.BooleanField()
 
@@ -24,13 +25,13 @@ class SubtaskReadSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     task_id = serializers.SlugRelatedField(queryset=Task.objects.all(), slug_field='id')
     name = serializers.CharField()
+    description = serializers.CharField()
     result = serializers.CharField()
     is_completed = serializers.BooleanField()
 
 
 class TasksListSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    # worker_id = serializers.IntegerField()
     name = serializers.CharField()
     is_completed = serializers.BooleanField()
     subtasks = serializers.JSONField()
