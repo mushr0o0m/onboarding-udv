@@ -208,8 +208,8 @@ class TaskView(APIView):
     def post(self, request):
         serializer = TasksSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({'post': serializer.data})
+        inst = serializer.save()
+        return Response({'post': serializer.data, 'task_id': inst.id})
 
     def put(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
@@ -217,11 +217,13 @@ class TaskView(APIView):
             return Response({"error": "Method PUT not allowed"})
 
         instance = Task.objects.get(pk=pk)
-
-        serializer = TasksSerializer(data=request.data, instance=instance)
+        data = {"worker_id": instance.worker_id,
+                "name": request.data["name"],
+                "is_completed": request.data["is_completed"]}
+        serializer = TasksSerializer(data=data, instance=instance)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({'post': serializer.data})
+        return Response({'put': serializer.data})
 
     def delete(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)

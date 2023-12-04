@@ -77,10 +77,9 @@ class TasksSerializer(serializers.Serializer):
         return Task.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.worker_id = validated_data.get("worker_id", instance.worker_id)
-        instance.name = validated_data.get("name", instance.name)
-        instance.result = validated_data.get("result", instance.result)
-        instance.is_completed = validated_data.get("is_completed", instance.is_completed)
+        instance.worker_id = validated_data["worker_id"]
+        instance.name = validated_data["name"]
+        instance.is_completed = validated_data["is_completed"]
         instance.save()
         return instance
 
