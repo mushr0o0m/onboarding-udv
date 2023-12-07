@@ -5,6 +5,9 @@ from .serializer import *
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from django.conf import settings
+from django.core.mail import send_mail
+from password_generator import PasswordGenerator
 
 
 class TasksListView(APIView):
@@ -46,6 +49,16 @@ class TasksListView(APIView):
         serializer.save()
         return Response({'post': serializer.data})
 
+    def patch(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method PATCH not allowed"})
+        instance = Subtask.objects.get(pk=pk)
+        instance.is_completed = bool(request.data['is_completed'])
+        instance.save()
+
+        return Response({'post': SubtaskSerializer(instance).data})
+
     def delete(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
         if not pk:
@@ -77,9 +90,7 @@ class WorkerListView(APIView):
                 for subtask in subtasks:
                     subtasks_list.append(SubtaskReadSerializer(subtask).data)
                 task_dict = {'id': task.id,
-                             'worker_id': task.worker_id,
                              'name': task.name,
-                             'result': task.result,
                              'is_completed': task.is_completed,
                              'subtasks': subtasks_list}
                 tasks_list.append(TasksListSerializer(task_dict).data)
@@ -108,7 +119,25 @@ class WorkerView(APIView):
 
     def post(self, request):
         data = request.data
-        user = User.objects.create_user(email=data['email'], password='Postupila_000')
+        hr = Hr.objects.get(user_id=request.user.id)
+
+        pwo = PasswordGenerator()
+        pwo.minlen = 8
+        pwo.maxlen = 8
+        pwo.minuchars = 2
+        pwo.minlchars = 4
+        pwo.minnumbers = 1
+        pwo.minschars = 1
+        password = pwo.generate()
+
+        user = User.objects.create_user(email=data['email'], password=password)
+
+        send_mail('Регистрация на сервисе для онбординга UDV',
+                  'Похоже вы недавно устроились на работу в UDV, поздравляем! Ваш Hr, ' + str(hr.name) +
+                  ' уже вас зарегистрировал(а). Переходите скорее в сервис \nВаш пароль: ' + str(password) + '.',
+                  settings.EMAIL_HOST_USER,
+                  [data['email']])
+
         worker = Worker.objects.get(user_id=user.id)
 
         worker.name = data['name']
@@ -116,7 +145,7 @@ class WorkerView(APIView):
         worker.patronymic = data['patronymic']
         worker.jobTitle = data['jobTitle']
         worker.employmentDate = data['employmentDate'][:10].replace('.', '-')
-        worker.hr_id = Hr.objects.get(user_id=request.user.id)
+        worker.hr_id = hr
         worker.save()
 
         tasklist = []
@@ -155,7 +184,6 @@ class WorkerView(APIView):
             task_dict = {'id': task.id,
                          'worker_id': task.worker_id,
                          'name': task.name,
-                         'result': task.result,
                          'is_completed': task.is_completed,
                          'subtasks': subtasks_list}
             tasks_list.append(TasksListSerializer(task_dict).data)
@@ -194,7 +222,9 @@ class WorkerView(APIView):
             return Response({"error": "Object does not exists"})
 
         instance = Worker.objects.get(id=pk)
+        user = User.objects.get(id=instance.user_id)
         instance.delete()
+        user.delete()
         return Response({'delete': 'ok'})
 
 
@@ -208,8 +238,8 @@ class TaskView(APIView):
     def post(self, request):
         serializer = TasksSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({'post': serializer.data})
+        inst = serializer.save()
+        return Response({'post': serializer.data, 'task_id': inst.id})
 
     def put(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
@@ -217,11 +247,23 @@ class TaskView(APIView):
             return Response({"error": "Method PUT not allowed"})
 
         instance = Task.objects.get(pk=pk)
-
-        serializer = TasksSerializer(data=request.data, instance=instance)
+        data = {"worker_id": instance.worker_id,
+                "name": request.data["name"],
+                "is_completed": request.data["is_completed"]}
+        serializer = TasksSerializer(data=data, instance=instance)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'post': serializer.data})
+
+    def patch(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method PATCH not allowed"})
+        instance = Task.objects.get(pk=pk)
+        instance.is_completed = bool(request.data['is_completed'])
+        instance.save()
+
+        return Response({'post': TasksSerializer(instance).data})
 
     def delete(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
