@@ -5,7 +5,7 @@ import { useTodo } from '../../../utils';
 
 
 export const TaskList: React.FC = () => {
-  const {tasks, subTasks, markTask} = useTodo();
+  const {tasks, markTask} = useTodo();
   console.log(tasks)
   return (
     <Form>
@@ -16,9 +16,9 @@ export const TaskList: React.FC = () => {
             id={task.id.toString()}
             label={task.name}
             defaultChecked={task.checked}
-            onChange={() => markTask(task.id)}
+            onChange={() => markTask(task.id, !task.checked)}
           />
-          <SubTaskList subTaskList={subTasks.filter((subTask) => (subTask.taskId === task.id))}/>
+          <SubTaskList subTaskList={task.subtasks}/>
         </div>
       ))}
     </Form>

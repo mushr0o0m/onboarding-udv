@@ -2,6 +2,7 @@ type Task = {
   id: number;
   name: string;
   checked: boolean;
+  subtasks?: SubTask[];
 };
 
 type SubTask = {

@@ -5,7 +5,7 @@ from .models import *
 class SubtaskSerializer(serializers.Serializer):
     task_id = serializers.SlugRelatedField(queryset=Task.objects.all(), slug_field='id')
     name = serializers.CharField()
-    description = serializers.CharField()
+    description = serializers.CharField(allow_blank=True, required=False)
     result = serializers.CharField()
     is_completed = serializers.BooleanField()
 
@@ -17,6 +17,7 @@ class SubtaskSerializer(serializers.Serializer):
         instance.name = validated_data.get("name", instance.name)
         instance.result = validated_data.get("result", instance.result)
         instance.is_completed = validated_data.get("is_completed", instance.is_completed)
+        instance.description = validated_data.get("description", instance.description)
         instance.save()
         return instance
 

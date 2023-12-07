@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Button, Form, Modal, Image } from 'react-bootstrap';
-import './CastomButtons.scss';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../utils';
 

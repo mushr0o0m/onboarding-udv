@@ -13,31 +13,34 @@ const DEFAULT_SUBTASK = {
   name: '',
   description: '',
   taskId: 0,
-  result: ''
+  result: '',
+  checked: false
 };
 
 export const SubtaskManagerModal: React.FC<SubtaskManagerModalProps> = ({ show, onHide, isModeAdd }) => {
-  const { tasks, subTasks, editSubTask, addSubTaskToTask, selectSubTasksIdForEdit } = useTodo();
-  const [parentTask, setParentTask] = React.useState(0);
+  const { tasks, editSubTask, addSubTaskToTask } = useTodo();
+  const [parentTask, setParentTask] = React.useState<Task>();
   const [subtaskIdForEdit, setSubtaskIdForEdit] = React.useState(0);
   const [subTask, setSubTask] = React.useState(DEFAULT_SUBTASK);
 
   const selectParentTask = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setParentTask(parseInt(event.target.value));
+    const parentTaskId = parseInt(event.target.value);
+    setSubTask(prevSubtask => ({...prevSubtask, taskId: parentTaskId}));
+    setParentTask(tasks.find((task) => task.id === parentTaskId));
   };
 
   const selectSubtaskForEdit = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedSubtask = parseInt(event.target.value);
     setSubtaskIdForEdit(selectedSubtask);
-    selectSubTasksIdForEdit(selectedSubtask);
-    setSubTask((subTasks).filter((task) => (task.id === selectedSubtask))[0]);
+    if (parentTask?.subtasks)
+      setSubTask(parentTask.subtasks.find((subtasks) => subtasks.id === selectedSubtask) || DEFAULT_SUBTASK);
   };
 
   const isRequiredFieldsSelected = () => {
     if (isModeAdd) {
-      return parentTask > 0
+      return parentTask
     }
-    return subtaskIdForEdit > 0 && parentTask > 0
+    return subtaskIdForEdit > 0 && parentTask
   }
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,25 +49,22 @@ export const SubtaskManagerModal: React.FC<SubtaskManagerModalProps> = ({ show, 
   };
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    if (!parentTask)
+      return
+
     event.preventDefault()
-    const subTaskItem = {
-      name: subTask.name,
-      description: subTask.description,
-      taskId: parentTask,
-      result: subTask.result
-    };
 
     closeModal();
     if (!isModeAdd) {
-      return editSubTask(subTaskItem);
+      return editSubTask({...subTask, id: subtaskIdForEdit});
     }
-    addSubTaskToTask(subTaskItem);
+    addSubTaskToTask(subTask);
   }
 
   const resetUseStateHooks = () =>{
     setSubTask(DEFAULT_SUBTASK);
     setSubtaskIdForEdit(0);
-    setParentTask(0);
+    setParentTask(undefined);
   }
 
   const closeModal = () => {
@@ -90,11 +90,11 @@ export const SubtaskManagerModal: React.FC<SubtaskManagerModalProps> = ({ show, 
     return (
       <Form.Group className='mb-3' controlId="selectSubtask">
         <Form.Label>Подзадача</Form.Label>
-        <Form.Select defaultValue={0} disabled={parentTask === 0} required aria-label="Выберите подзадачу"
+        <Form.Select defaultValue={0} disabled={!parentTask} required aria-label="Выберите подзадачу"
           onChange={selectSubtaskForEdit}>
           <option>Выберите подзадачу</option>
-          {subTasks.map((subTask) => {
-            if (subTask.taskId === parentTask)
+          {parentTask?.subtasks && parentTask.subtasks.map((subTask) => {
+            if (subTask.taskId === parentTask.id)
               return <option key={subTask.id} value={subTask.id}>{subTask.name}</option>
           })}
         </Form.Select>
