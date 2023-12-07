@@ -44,5 +44,8 @@ urlpatterns = [
     path('api/tasks/<int:pk>/', TaskView.as_view()),  # get - возвращает список tasks без subtasks для worker id
                                                       # put/delete - изменение/удаление task по task id
 
-    path('api/name/', NameUser.as_view())  # get - возвращает ФИО или только имя по токену. Работает для hr и worker
+    path('api/name/', NameUser.as_view()),  # get - возвращает ФИО или только имя по токену. Работает для hr и worker
+
+    path('api/contacts/', ContactView.as_view()),
+    path('api/contacts/<int:pk>/', ContactView.as_view()),
 ]
