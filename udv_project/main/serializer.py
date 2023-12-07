@@ -104,6 +104,8 @@ class UserSerializer(serializers.Serializer):
 class ContactReadSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
+    surname = serializers.CharField()
+    patronymic = serializers.CharField()
     email = serializers.CharField()
     telegram = serializers.CharField()
     jobTitle = serializers.CharField()
@@ -111,6 +113,8 @@ class ContactReadSerializer(serializers.Serializer):
 
 class ContactSerializer(serializers.Serializer):
     name = serializers.CharField()
+    surname = serializers.CharField()
+    patronymic = serializers.CharField()
     email = serializers.CharField()
     telegram = serializers.CharField()
     jobTitle = serializers.CharField()
@@ -121,6 +125,8 @@ class ContactSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         instance.email = validated_data["email"]
         instance.name = validated_data["name"]
+        instance.surname = validated_data["surname"]
+        instance.patronymic = validated_data["patronymic"]
         instance.telegram = validated_data["telegram"]
         instance.jobTitle = validated_data["jobTitle"]
         instance.save()

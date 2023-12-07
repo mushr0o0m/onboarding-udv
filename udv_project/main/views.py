@@ -151,7 +151,9 @@ class WorkerView(APIView):
         worker.save()
 
         contact = Contact.objects.create()
-        contact.name = ' '.join([data['name'], data['surname'], data['patronymic']])
+        contact.name = data['name']
+        contact.surname = data['surname']
+        contact.patronymic = data['patronymic']
         contact.email = data['email']
         contact.telegram = data['telegram']
         contact.jobTitle = data['jobTitle']
@@ -310,7 +312,9 @@ class NameUser(APIView):
                              'patronymic': worker.patronymic})
         else:
             hr = Hr.objects.get(user_id=user.id)
-            return Response({'name': hr.name})
+            return Response({'name': hr.name,
+                             'surname': hr.surname,
+                             'patronymic': hr.patronymic})
 
 
 class ContactView(APIView):
