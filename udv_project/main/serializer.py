@@ -42,6 +42,7 @@ class WorkersSerializer(serializers.Serializer):
     name = serializers.CharField()
     surname = serializers.CharField()
     patronymic = serializers.CharField()
+    telegram = serializers.CharField()
     hr_id = serializers.IntegerField()
     jobTitle = serializers.CharField()
     employmentDate = serializers.DateField()
@@ -54,6 +55,7 @@ class WorkerPutSerializer(serializers.Serializer):
     name = serializers.CharField()
     surname = serializers.CharField()
     patronymic = serializers.CharField()
+    telegram = serializers.CharField()
     jobTitle = serializers.CharField()
     employmentDate = serializers.DateField()
     hr_id = serializers.SlugRelatedField(queryset=Hr.objects.all(), slug_field='id')
@@ -62,6 +64,7 @@ class WorkerPutSerializer(serializers.Serializer):
         instance.name = validated_data.get("name", instance.name)
         instance.surname = validated_data.get("surname", instance.surname)
         instance.patronymic = validated_data.get("patronymic", instance.patronymic)
+        instance.telegram = validated_data.get("telegram", instance.telegram)
         instance.jobTitle = validated_data.get("jobTitle", instance.jobTitle)
         instance.employmentDate = validated_data.get("employmentDate", instance.employmentDate)
         instance.hr_id = validated_data.get("hr_id", instance.hr_id)
@@ -96,3 +99,29 @@ class UserSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     email = serializers.CharField()
     who = serializers.CharField()
+
+
+class ContactReadSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    email = serializers.CharField()
+    telegram = serializers.CharField()
+    jobTitle = serializers.CharField()
+
+
+class ContactSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    email = serializers.CharField()
+    telegram = serializers.CharField()
+    jobTitle = serializers.CharField()
+
+    def create(self, validated_data):
+        return Contact.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.email = validated_data["email"]
+        instance.name = validated_data["name"]
+        instance.telegram = validated_data["telegram"]
+        instance.jobTitle = validated_data["jobTitle"]
+        instance.save()
+        return instance

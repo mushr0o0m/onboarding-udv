@@ -99,6 +99,7 @@ class WorkerListView(APIView):
                                                    'name': worker.name,
                                                    'surname': worker.surname,
                                                    'patronymic': worker.patronymic,
+                                                   'telegram': worker.telegram,
                                                    'hr_id': worker.hr_id,
                                                    'jobTitle': worker.jobTitle,
                                                    'employmentDate': worker.employmentDate,
@@ -121,32 +122,40 @@ class WorkerView(APIView):
         data = request.data
         hr = Hr.objects.get(user_id=request.user.id)
 
-        pwo = PasswordGenerator()
+        '''pwo = PasswordGenerator()
         pwo.minlen = 8
         pwo.maxlen = 8
         pwo.minuchars = 2
         pwo.minlchars = 4
         pwo.minnumbers = 1
         pwo.minschars = 1
-        password = pwo.generate()
+        password = pwo.generate()'''
 
-        user = User.objects.create_user(email=data['email'], password=password)
+        user = User.objects.create_user(email=data['email'], password='AB133777')  # password)
 
-        send_mail('Регистрация на сервисе для онбординга UDV',
+        '''send_mail('Регистрация на сервисе для онбординга UDV',
                   'Похоже вы недавно устроились на работу в UDV, поздравляем! Ваш Hr, ' + str(hr.name) +
                   ' уже вас зарегистрировал(а). Переходите скорее в сервис \nВаш пароль: ' + str(password) + '.',
                   settings.EMAIL_HOST_USER,
-                  [data['email']])
+                  [data['email']])'''
 
         worker = Worker.objects.get(user_id=user.id)
 
         worker.name = data['name']
         worker.surname = data['surname']
         worker.patronymic = data['patronymic']
+        worker.telegram = data['telegram']
         worker.jobTitle = data['jobTitle']
         worker.employmentDate = data['employmentDate'][:10].replace('.', '-')
         worker.hr_id = hr
         worker.save()
+
+        contact = Contact.objects.create()
+        contact.name = ' '.join([data['name'], data['surname'], data['patronymic']])
+        contact.email = data['email']
+        contact.telegram = data['telegram']
+        contact.jobTitle = data['jobTitle']
+        contact.save()
 
         tasklist = []
         tasks = data['tasks']
@@ -159,13 +168,15 @@ class WorkerView(APIView):
                                                       'name': worker.name,
                                                       'surname': worker.surname,
                                                       'patronymic': worker.patronymic,
+                                                      'telegram': worker.telegram,
                                                       'hr_id': worker.hr_id,
                                                       'jobTitle': worker.jobTitle,
                                                       'employmentDate': worker.employmentDate,
                                                       'email': user.email,
                                                       'user_id': user.id,
                                                       'tasks': tasklist
-                                                      }).data
+                                                      }).data,
+                         'contact': ContactReadSerializer(contact).data
                          })
 
     def get(self, request, *args, **kwargs):
@@ -192,6 +203,7 @@ class WorkerView(APIView):
                                                       'name': worker.name,
                                                       'surname': worker.surname,
                                                       'patronymic': worker.patronymic,
+                                                      'telegram': worker.telegram,
                                                       'hr_id': hr.id,
                                                       'jobTitle': worker.jobTitle,
                                                       'employmentDate': worker.employmentDate,
@@ -206,11 +218,20 @@ class WorkerView(APIView):
             return Response({"error": "Method PUT not allowed"})
 
         instance = Worker.objects.get(pk=pk)
+        user = User.objects.get(id=instance.user_id)
 
         serializer = WorkerPutSerializer(data=request.data, instance=instance)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({'post': serializer.data})
+
+        request_data = request.data
+        request_data.update({"email": user.email})
+
+        serializer_contact = ContactSerializer(data=request.data, instance=instance)
+        serializer_contact.is_valid(raise_exception=True)
+        serializer_contact.save()
+        return Response({'post': serializer.data,
+                         'contact': serializer_contact.data})
 
     def delete(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
@@ -290,3 +311,44 @@ class NameUser(APIView):
         else:
             hr = Hr.objects.get(user_id=user.id)
             return Response({'name': hr.name})
+
+
+class ContactView(APIView):
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        try:
+            contact = Contact.objects.get(pk=pk)
+        except:
+            return Response({"error": "Object does not exists"})
+        return Response({'post': ContactReadSerializer(contact).data})
+
+    def post(self, request):
+        serializer = ContactSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        inst = serializer.save()
+        return Response({'post': serializer.data, 'contact_id': inst.id})
+
+    def put(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method PUT not allowed"})
+
+        instance = Contact.objects.get(pk=pk)
+
+        serializer = ContactSerializer(data=request.data, instance=instance)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'post': serializer.data})
+
+    def delete(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method PUT not allowed"})
+        try:
+            instance = Contact.objects.get(pk=pk)
+        except:
+            return Response({"error": "Object does not exists"})
+
+        instance = Contact.objects.get(pk=pk)
+        instance.delete()
+        return Response({'delete': 'ok'})
