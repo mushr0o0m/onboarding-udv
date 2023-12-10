@@ -8,11 +8,15 @@ from rest_framework.viewsets import GenericViewSet
 from django.conf import settings
 from django.core.mail import send_mail
 from password_generator import PasswordGenerator
+from django.http import Http404
 
 
 class TasksListView(APIView):
     def get(self, request):
-        worker = Worker.objects.get(user_id=request.user.id)
+        try:
+            worker = Worker.objects.get(user_id=request.user.id)
+        except:
+            raise Http404
         tasks = Task.objects.filter(worker_id=worker.id)
         tasks_list = []
 
@@ -37,12 +41,10 @@ class TasksListView(APIView):
 
     def put(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method PUT not allowed"})
         try:
             instance = Subtask.objects.get(pk=pk)
         except:
-            return Response({"error": "Object does not exists"})
+            raise Http404
 
         serializer = SubtaskSerializer(data=request.data, instance=instance)
         serializer.is_valid(raise_exception=True)
@@ -51,9 +53,10 @@ class TasksListView(APIView):
 
     def patch(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method PATCH not allowed"})
-        instance = Subtask.objects.get(pk=pk)
+        try:
+            instance = Subtask.objects.get(pk=pk)
+        except:
+            raise Http404
         instance.is_completed = bool(request.data['is_completed'])
         instance.save()
 
@@ -61,12 +64,10 @@ class TasksListView(APIView):
 
     def delete(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method PUT not allowed"})
         try:
             instance = Subtask.objects.get(pk=pk)
         except:
-            return Response({"error": "Object does not exists"})
+            raise Http404
 
         instance = Subtask.objects.get(id=pk)
         instance.delete()
@@ -75,8 +76,11 @@ class TasksListView(APIView):
 
 class WorkerListView(APIView):
     def get(self, request):
-        hr = Hr.objects.get(user_id=request.user.id)
-        workers = Worker.objects.filter(hr_id=hr.id)
+        try:
+            hr = Hr.objects.get(user_id=request.user.id)
+            workers = Worker.objects.filter(hr_id=hr.id)
+        except:
+            raise Http404
         workers_list = []
         for worker in workers:
             user = User.objects.get(id=worker.user_id)
@@ -120,7 +124,10 @@ class WorkerView(APIView):
 
     def post(self, request):
         data = request.data
-        hr = Hr.objects.get(user_id=request.user.id)
+        try:
+            hr = Hr.objects.get(user_id=request.user.id)
+        except:
+            raise Http404
 
         '''pwo = PasswordGenerator()
         pwo.minlen = 8
@@ -183,9 +190,12 @@ class WorkerView(APIView):
 
     def get(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
-        worker = Worker.objects.get(id=pk)
-        hr = Hr.objects.get(id=worker.hr_id)
-        user = User.objects.get(id=worker.user_id)
+        try:
+            worker = Worker.objects.get(id=pk)
+            hr = Hr.objects.get(id=worker.hr_id)
+            user = User.objects.get(id=worker.user_id)
+        except:
+            raise Http404
         tasks = Task.objects.filter(worker_id=worker.id)
         tasks_list = []
 
@@ -216,11 +226,11 @@ class WorkerView(APIView):
 
     def put(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method PUT not allowed"})
-
-        instance = Worker.objects.get(pk=pk)
-        user = User.objects.get(id=instance.user_id)
+        try:
+            instance = Worker.objects.get(pk=pk)
+            user = User.objects.get(id=instance.user_id)
+        except:
+            raise Http404
 
         serializer = WorkerPutSerializer(data=request.data, instance=instance)
         serializer.is_valid(raise_exception=True)
@@ -237,12 +247,10 @@ class WorkerView(APIView):
 
     def delete(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method PUT not allowed"})
         try:
             instance = Worker.objects.get(pk=pk)
         except:
-            return Response({"error": "Object does not exists"})
+            raise Http404
 
         instance = Worker.objects.get(id=pk)
         user = User.objects.get(id=instance.user_id)
@@ -254,7 +262,10 @@ class WorkerView(APIView):
 class TaskView(APIView):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
-        worker = Worker.objects.get(pk=pk)
+        try:
+            worker = Worker.objects.get(pk=pk)
+        except:
+            raise Http404
         tasks = Task.objects.filter(worker_id=worker.id)
         return Response({'tasks': TasksReadSerializer(tasks, many=True).data})
 
@@ -266,10 +277,10 @@ class TaskView(APIView):
 
     def put(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method PUT not allowed"})
-
-        instance = Task.objects.get(pk=pk)
+        try:
+            instance = Task.objects.get(pk=pk)
+        except:
+            raise Http404
         data = {"worker_id": instance.worker_id,
                 "name": request.data["name"],
                 "is_completed": request.data["is_completed"]}
@@ -280,9 +291,10 @@ class TaskView(APIView):
 
     def patch(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method PATCH not allowed"})
-        instance = Task.objects.get(pk=pk)
+        try:
+            instance = Task.objects.get(pk=pk)
+        except:
+            raise Http404
         instance.is_completed = bool(request.data['is_completed'])
         instance.save()
 
@@ -290,14 +302,10 @@ class TaskView(APIView):
 
     def delete(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method PUT not allowed"})
         try:
             instance = Task.objects.get(pk=pk)
         except:
-            return Response({"error": "Object does not exists"})
-
-        instance = Task.objects.get(pk=pk)
+            raise Http404
         instance.delete()
         return Response({'delete': 'ok'})
 
@@ -323,21 +331,24 @@ class ContactView(APIView):
         try:
             contact = Contact.objects.get(pk=pk)
         except:
-            return Response({"error": "Object does not exists"})
+            raise Http404
         return Response({'post': ContactReadSerializer(contact).data})
 
     def post(self, request):
-        serializer = ContactSerializer(data=request.data)
+        try:
+            serializer = ContactSerializer(data=request.data)
+        except:
+            raise Http404
         serializer.is_valid(raise_exception=True)
         inst = serializer.save()
         return Response({'post': serializer.data, 'contact_id': inst.id})
 
     def put(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method PUT not allowed"})
-
-        instance = Contact.objects.get(pk=pk)
+        try:
+            instance = Contact.objects.get(pk=pk)
+        except:
+            raise Http404
 
         serializer = ContactSerializer(data=request.data, instance=instance)
         serializer.is_valid(raise_exception=True)
@@ -346,14 +357,10 @@ class ContactView(APIView):
 
     def delete(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method PUT not allowed"})
         try:
             instance = Contact.objects.get(pk=pk)
         except:
-            return Response({"error": "Object does not exists"})
-
-        instance = Contact.objects.get(pk=pk)
+            raise Http404
         instance.delete()
         return Response({'delete': 'ok'})
 
@@ -364,7 +371,7 @@ class ProjectView(APIView):
         try:
             contact = Project.objects.get(pk=pk)
         except:
-            return Response({"error": "Object does not exists"})
+            raise Http404
         return Response({'post': ProjectReadSerializer(contact).data})
 
     def post(self, request):
@@ -372,35 +379,38 @@ class ProjectView(APIView):
         serializer.is_valid(raise_exception=True)
         inst = serializer.save()
         for contact_id in request.data["contacts_ids"]:
-            inst.contacts.add(Contact.objects.get(id=contact_id))
+            try:
+                contact = Contact.objects.get(id=contact_id)
+            except:
+                raise Http404
+            inst.contacts.add(contact)
         inst.save()
         return Response({'post': ProjectReadSerializer(inst).data, 'project_id': inst.id})
 
     def put(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method PUT not allowed"})
-
-        instance = Project.objects.get(pk=pk)
-
+        try:
+            instance = Project.objects.get(pk=pk)
+        except:
+            raise Http404
         serializer = ProjectSerializer(data=request.data, instance=instance)
         serializer.is_valid(raise_exception=True)
         project = serializer.save()
         project.contacts.clear()
         for contact_id in request.data["contacts_ids"]:
-            project.contacts.add(Contact.objects.get(id=contact_id))
+            try:
+                contact = Contact.objects.get(id=contact_id)
+            except:
+                raise Http404
+            project.contacts.add(contact)
         project.save()
         return Response({'post': ProjectReadSerializer(project).data})
 
     def delete(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method PUT not allowed"})
         try:
             instance = Project.objects.get(pk=pk)
         except:
-            return Response({"error": "Object does not exists"})
-
-        instance = Project.objects.get(pk=pk)
+            raise Http404
         instance.delete()
         return Response({'delete': 'ok'})
