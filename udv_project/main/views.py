@@ -232,22 +232,58 @@ class WorkerView(APIView):
     def put(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
         try:
-            instance = Worker.objects.get(pk=pk)
-            user = User.objects.get(id=instance.user_id)
+            worker = Worker.objects.get(pk=pk)
+            user = User.objects.get(id=worker.user_id)
         except:
             raise Http404
-
-        serializer = WorkerPutSerializer(data=request.data, instance=instance)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
         request_data = request.data
-        request_data.update({"email": user.email})
+        request_data.update({"email": user.email, "hr_id": worker.hr_id})
+        serializer_worker = WorkerPutSerializer(data=request_data, instance=worker)
+        serializer_worker.is_valid(raise_exception=True)
+        serializer_worker.save()
 
-        serializer_contact = ContactSerializer(data=request.data, instance=instance)
+        tasks = Task.objects.filter(worker_id=worker.id)
+        tasks_list = []
+
+        for task in tasks:
+            subtasks_list = []
+            subtasks = Subtask.objects.filter(task_id=task.id)
+            for subtask in subtasks:
+                subtasks_list.append(SubtaskReadSerializer(subtask).data)
+            task_dict = {'id': task.id,
+                         'worker_id': task.worker_id,
+                         'name': task.name,
+                         'is_completed': task.is_completed,
+                         'subtasks': subtasks_list}
+            tasks_list.append(TasksListSerializer(task_dict).data)
+
+        for row_task in request.data['tasks']:
+            row_task.update({"worker_id": worker.id, "is_completed": False})
+            serializer_task = TasksSerializer(data=row_task)
+            serializer_task.is_valid(raise_exception=True)
+            task = serializer_task.save()
+            task_dict = {'id': task.id,
+                         'worker_id': task.worker_id,
+                         'name': task.name,
+                         'is_completed': task.is_completed,
+                         'subtasks': []}
+
+            tasks_list.append(TasksListSerializer(task_dict).data)
+
+        serializer_contact = ContactSerializer(data=request.data, instance=worker)
         serializer_contact.is_valid(raise_exception=True)
         serializer_contact.save()
-        return Response({'post': serializer.data,
+        return Response({'post': WorkersSerializer({'id': worker.id,
+                                                    'name': worker.name,
+                                                    'surname': worker.surname,
+                                                    'patronymic': worker.patronymic,
+                                                    'telegram': worker.telegram,
+                                                    'hr_id': worker.hr_id,
+                                                    'jobTitle': worker.jobTitle,
+                                                    'employmentDate': worker.employmentDate,
+                                                    'email': user.email,
+                                                    'user_id': user.id,
+                                                    'tasks': tasks_list}).data,
                          'contact': serializer_contact.data})
 
     def delete(self, request, *args, **kwargs):
@@ -338,6 +374,8 @@ class NameUser(APIView):
 class ContactView(APIView):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({'post': ContactReadSerializer(Contact.objects.all(), many=True).data})
         try:
             contact = Contact.objects.get(pk=pk)
         except:
@@ -379,7 +417,8 @@ class ProjectView(APIView):
             contact = Project.objects.get(pk=pk)
         except:
             raise Http404
-        return Response({'post': ProjectReadSerializer(contact).data})
+        return Response({'post': ProjectReadSerializer(contact).data,
+                         'all_contacts': ContactReadSerializer(Contact.objects.all(), many=True).data})
 
     def post(self, request):
         serializer = ProjectSerializer(data=request.data)
