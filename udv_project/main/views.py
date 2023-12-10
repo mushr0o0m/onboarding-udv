@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import *
 from .serializer import *
+from .constants import *
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -18,7 +19,11 @@ class TasksListView(APIView):
             worker = Worker.objects.get(user_id=request.user.id)
         except:
             raise Http404
-        tasks = Task.objects.filter(worker_id=worker.id)
+        if worker.is_first_day:
+            tasks = Task.objects.filter(worker_id=worker.id)[:8]
+        else:
+            tasks = Task.objects.filter(worker_id=worker.id)
+
         tasks_list = []
 
         for task in tasks:
@@ -112,6 +117,7 @@ class WorkerListView(APIView):
                                                    'hr_id': worker.hr_id,
                                                    'jobTitle': worker.jobTitle,
                                                    'employmentDate': worker.employmentDate,
+                                                   'is_first_day': worker.is_first_day,
                                                    'email': user.email,
                                                    'user_id': user.id,
                                                    'tasks': tasks_list
@@ -159,6 +165,7 @@ class WorkerView(APIView):
         worker.telegram = data['telegram']
         worker.jobTitle = data['jobTitle']
         worker.employmentDate = data['employmentDate'][:10].replace('.', '-')
+        worker.is_first_day = True
         worker.hr_id = hr
         worker.save()
 
@@ -173,6 +180,10 @@ class WorkerView(APIView):
 
         tasklist = []
         tasks = data['tasks']
+        for task_name in FIRST_DAY_TASKS:
+            tasklist.append(TasksReadSerializer(Task.objects.create(worker_id=worker,
+                                                                    name=task_name,
+                                                                    is_completed=False)).data)
         for task in tasks:
             tasklist.append(TasksReadSerializer(Task.objects.create(worker_id=worker,
                                                                     name=task['name'],
@@ -186,6 +197,7 @@ class WorkerView(APIView):
                                                       'hr_id': worker.hr_id,
                                                       'jobTitle': worker.jobTitle,
                                                       'employmentDate': worker.employmentDate,
+                                                      'is_first_day': worker.is_first_day,
                                                       'email': user.email,
                                                       'user_id': user.id,
                                                       'tasks': tasklist
@@ -224,6 +236,7 @@ class WorkerView(APIView):
                                                       'hr_id': hr.id,
                                                       'jobTitle': worker.jobTitle,
                                                       'employmentDate': worker.employmentDate,
+                                                      'is_first_day': worker.is_first_day,
                                                       'email': user.email,
                                                       'user_id': user.id,
                                                       'tasks': tasks_list
@@ -343,6 +356,18 @@ class TaskView(APIView):
             raise Http404
         instance.is_completed = bool(request.data['is_completed'])
         instance.save()
+        worker = Worker.objects.get(id=instance.worker_id)
+        if worker.is_first_day:
+            tasks = Task.objects.filter(worker_id=worker.id)[:8]
+            is_all_completed = True
+            for task in tasks:
+                if not task.is_completed:
+                    is_all_completed = False
+            if is_all_completed:
+                worker.is_first_day = False
+                for task in tasks:
+                    task.delete()
+                worker.save()
 
         return Response({'post': TasksSerializer(instance).data})
 
@@ -413,6 +438,8 @@ class ContactView(APIView):
 class ProjectView(APIView):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({'post': ProjectReadSerializer(Project.objects.all(), many=True).data})
         try:
             contact = Project.objects.get(pk=pk)
         except:

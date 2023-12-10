@@ -49,6 +49,7 @@ class WorkersSerializer(serializers.Serializer):
     employmentDate = serializers.DateField()
     email = serializers.CharField()
     user_id = serializers.IntegerField()
+    is_first_day = serializers.BooleanField()
     tasks = serializers.JSONField()
 
 
