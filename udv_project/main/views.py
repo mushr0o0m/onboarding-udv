@@ -356,3 +356,51 @@ class ContactView(APIView):
         instance = Contact.objects.get(pk=pk)
         instance.delete()
         return Response({'delete': 'ok'})
+
+
+class ProjectView(APIView):
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        try:
+            contact = Project.objects.get(pk=pk)
+        except:
+            return Response({"error": "Object does not exists"})
+        return Response({'post': ProjectReadSerializer(contact).data})
+
+    def post(self, request):
+        serializer = ProjectSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        inst = serializer.save()
+        for contact_id in request.data["contacts_ids"]:
+            inst.contacts.add(Contact.objects.get(id=contact_id))
+        inst.save()
+        return Response({'post': ProjectReadSerializer(inst).data, 'project_id': inst.id})
+
+    def put(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method PUT not allowed"})
+
+        instance = Project.objects.get(pk=pk)
+
+        serializer = ProjectSerializer(data=request.data, instance=instance)
+        serializer.is_valid(raise_exception=True)
+        project = serializer.save()
+        project.contacts.clear()
+        for contact_id in request.data["contacts_ids"]:
+            project.contacts.add(Contact.objects.get(id=contact_id))
+        project.save()
+        return Response({'post': ProjectReadSerializer(project).data})
+
+    def delete(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method PUT not allowed"})
+        try:
+            instance = Project.objects.get(pk=pk)
+        except:
+            return Response({"error": "Object does not exists"})
+
+        instance = Project.objects.get(pk=pk)
+        instance.delete()
+        return Response({'delete': 'ok'})

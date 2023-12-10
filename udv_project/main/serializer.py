@@ -131,3 +131,28 @@ class ContactSerializer(serializers.Serializer):
         instance.jobTitle = validated_data["jobTitle"]
         instance.save()
         return instance
+
+
+class ProjectReadSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    description = serializers.CharField()
+    desk_link = serializers.CharField()
+    contacts = ContactReadSerializer(read_only=True, many=True)
+
+
+class ProjectSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    description = serializers.CharField()
+    desk_link = serializers.CharField()
+
+    def create(self, validated_data):
+        return Project.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data["name"]
+        instance.description = validated_data["description"]
+        instance.desk_link = validated_data["desk_link"]
+        instance.save()
+        return instance
+
