@@ -121,7 +121,7 @@ class Task(models.Model):
 class Subtask(models.Model):
     task_id = models.ForeignKey(Task, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
-    description = models.CharField(max_length=10000, null=True)
+    description = models.CharField(max_length=10000, null=True, blank=True)
     result = models.CharField(max_length=100, null=True)
     is_completed = models.BooleanField()
 
