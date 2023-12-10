@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from password_generator import PasswordGenerator
 from django.http import Http404
+from django.http import HttpResponseBadRequest
 
 
 class TasksListView(APIView):
@@ -34,6 +35,10 @@ class TasksListView(APIView):
         return Response({'tasks': tasks_list})
 
     def post(self, request):
+        try:
+            task = Task.objects.get(id=request.data['task_id'])
+        except:
+            return HttpResponseBadRequest("We cannot process the request. Not such task")
         serializer = SubtaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         inst = serializer.save()
@@ -78,9 +83,9 @@ class WorkerListView(APIView):
     def get(self, request):
         try:
             hr = Hr.objects.get(user_id=request.user.id)
-            workers = Worker.objects.filter(hr_id=hr.id)
         except:
             raise Http404
+        workers = Worker.objects.filter(hr_id=hr.id)
         workers_list = []
         for worker in workers:
             user = User.objects.get(id=worker.user_id)
@@ -127,7 +132,7 @@ class WorkerView(APIView):
         try:
             hr = Hr.objects.get(user_id=request.user.id)
         except:
-            raise Http404
+            return HttpResponseBadRequest("We cannot process the request. Not such hr")
 
         '''pwo = PasswordGenerator()
         pwo.minlen = 8
@@ -270,6 +275,11 @@ class TaskView(APIView):
         return Response({'tasks': TasksReadSerializer(tasks, many=True).data})
 
     def post(self, request):
+        try:
+            worker = Worker.objects.get(id=request.data['worker_id'])
+        except:
+            return HttpResponseBadRequest("We cannot process the request. Not such worker")
+
         serializer = TasksSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         inst = serializer.save()
@@ -335,10 +345,7 @@ class ContactView(APIView):
         return Response({'post': ContactReadSerializer(contact).data})
 
     def post(self, request):
-        try:
-            serializer = ContactSerializer(data=request.data)
-        except:
-            raise Http404
+        serializer = ContactSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         inst = serializer.save()
         return Response({'post': serializer.data, 'contact_id': inst.id})
@@ -382,7 +389,7 @@ class ProjectView(APIView):
             try:
                 contact = Contact.objects.get(id=contact_id)
             except:
-                raise Http404
+                return HttpResponseBadRequest("We cannot process the request. Not such contact")
             inst.contacts.add(contact)
         inst.save()
         return Response({'post': ProjectReadSerializer(inst).data, 'project_id': inst.id})
@@ -401,7 +408,7 @@ class ProjectView(APIView):
             try:
                 contact = Contact.objects.get(id=contact_id)
             except:
-                raise Http404
+                return HttpResponseBadRequest("We cannot process the request. Not such contact")
             project.contacts.add(contact)
         project.save()
         return Response({'post': ProjectReadSerializer(project).data})
