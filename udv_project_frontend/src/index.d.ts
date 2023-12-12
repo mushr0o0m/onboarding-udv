@@ -26,3 +26,36 @@ type Employee = {
   tasks: Task[];
 }
 
+//Response
+
+type ResponseEmployee = {
+  id: number,
+  name: string,
+  surname: string,
+  patronymic?: string,
+  telegram: string,
+  hr_id: number,
+  jobTitle: string,
+  employmentDate: string,
+  email: string,
+  user_id: number,
+  tasks: ResponseTask[]
+}
+
+type ResponseTask = {
+  id: number,
+  worker_id: number,
+  name: string,
+  is_completed: boolean,
+  subtasks: ResponseSubtask[]
+}
+
+type ResponseSubtask = {
+  id: number,
+  task_id: number,
+  name: string,
+  result: string,
+  description: string,
+  is_completed: boolean
+}
+

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { TodoContext } from './TodoContext';
-import { deleteSubtask, getTaskList, patchTask, postSubtask, putSubtask } from './requests/TodoRequests';
+import { deleteSubtask, getTaskList, patchTask, postSubtask, putSubtask } from './api/TodoRequests';
 import { useAuth } from '../AuthContext/useAuth';
 
 interface TodoProviderProps {
@@ -32,7 +32,7 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
     const newSubTask = {
       description, name, checked: false, taskId, result
     };
-
+    
     postSubtask(newSubTask, token)
       .then((subtask: SubTask) =>
         setTasks(prevTask =>

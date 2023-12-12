@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Form, Modal, Image } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../utils';
+import { useAuth } from '../../utils/indext';
 
 
 export const AuthenticationPage: React.FC = () => {
@@ -25,9 +25,7 @@ export const AuthenticationPage: React.FC = () => {
   };
 
   const onValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    
     setUserDetail({ ...userDetail, [e.target.name]: e.target.value });
-    console.log(userDetail)
     // setValidatedForm(true);
   };
 

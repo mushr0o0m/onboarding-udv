@@ -1,6 +1,6 @@
 import React from 'react';
 import { TitlePageComponent } from '../../../components/TitlePageComponent';
-import { useHrStaff } from '../../../utils';
+import { getFormatedDate, useHrStaff } from '../../../utils/indext';
 import { StaffSearch } from './components/StaffSearch';
 import { StaffCard } from './components/StaffCard';
 
@@ -9,12 +9,12 @@ export const HrStaffListPage: React.FC = () => {
 
 
   const [searchQuery, setSearchQuery] = React.useState('');
-  const { staff, getFormatedDate, deleteEmployee } = useHrStaff();
+  const { staff, removeEmployee } = useHrStaff();
   const [filteredStaff, setFilteredStaff] = React.useState(staff);
   const [noResults, setNoResults] = React.useState(false);
 
   const onDelete = ((id: Employee['id']) => {
-    deleteEmployee(id);
+    removeEmployee(id);
   })
 
   React.useEffect(() => {

@@ -4,7 +4,7 @@ import { TitlePageComponent } from '../../../components/TitlePageComponent';
 import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
 import { AdaptationCriteriaForm } from './components/AdaptationCriteriaForm';
 import { AdaptationCriteriaList } from './components/AdaptationCriteriaList';
-import { useHrStaff } from '../../../utils';
+import { getFormatedDate, useHrStaff } from '../../../utils/indext';
 
 const DEFAULT_EMPLOYEE = {
   name: '',
@@ -24,7 +24,8 @@ export const HrStaffProfileManager: React.FC = () => {
   const { staff } = useHrStaff();
   const isEdit = location.pathname.includes('/edit');
   const { id } = useParams();
-  const { getFormatedDate, addEmployee, editEmployee } = useHrStaff();
+  const { addEmployee, editEmployee } = useHrStaff();
+  
   const getEditableEmployee = () => {
     if (isEdit && id) {
       const editableEmployee = staff.find(employee => employee.id === parseInt(id || '-1'))

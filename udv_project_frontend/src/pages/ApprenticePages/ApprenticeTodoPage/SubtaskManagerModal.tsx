@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { useTodo } from '../../../utils';
+import { useTodo } from '../../../utils/indext';
 
 
 interface SubtaskManagerModalProps {
@@ -9,7 +9,7 @@ interface SubtaskManagerModalProps {
   isModeAdd: boolean;
 }
 
-const DEFAULT_SUBTASK = {
+const DEFAULT_SUBTASK: Omit<SubTask, 'id'> = {
   name: '',
   description: '',
   taskId: 0,
@@ -26,7 +26,7 @@ export const SubtaskManagerModal: React.FC<SubtaskManagerModalProps> = ({ show, 
   const selectParentTask = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const parentTaskId = parseInt(event.target.value);
     setSubTask(prevSubtask => ({...prevSubtask, taskId: parentTaskId}));
-    setParentTask(tasks.find((task) => task.id === parentTaskId));
+    setParentTask(tasks.find((task: Task) => task.id === parentTaskId));
   };
 
   const selectSubtaskForEdit = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -134,7 +134,7 @@ export const SubtaskManagerModal: React.FC<SubtaskManagerModalProps> = ({ show, 
 
           <Form.Group className="mb-3" controlId="subtaskDescr">
             <Form.Label>Описание</Form.Label>
-            <Form.Control disabled={!isRequiredFieldsSelected()} name='description' onChange={onChange} as="textarea" rows={3} placeholder="Опишите подзадачу" />
+            <Form.Control disabled={!isRequiredFieldsSelected()} value={subTask.description} name='description' onChange={onChange} as="textarea" rows={3} placeholder="Опишите подзадачу" />
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="subtaskResult">

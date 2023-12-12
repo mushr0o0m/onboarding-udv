@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { useTodo } from '../../../utils';
+import { useTodo } from '../../../utils/indext';
 
 interface SubTaskListProps {
   subTaskList?: SubTask[];
@@ -10,13 +10,15 @@ export const SubTaskList: React.FC<SubTaskListProps> = ({ subTaskList }) => {
   const { editSubTask } = useTodo();
 
   const toolTip = (subtaskDescr: Omit<SubTask, 'id' | 'taskId' | 'checked'>) => (
-    <Tooltip id="subtask-prompt" style={{ maxWidth: '600px !important' }}>
-      <div className='text-start d-inline-block' style={{ whiteSpace: 'nowrap' }}>
-        <div className=' mb-1'>{subtaskDescr.name}</div>
-        {subtaskDescr.description && <div className='text-start mb-1'>{`Описание: ${subtaskDescr.description}`}</div>}
-        {subtaskDescr.result && <div className='text-start mb-1'>{`Результат: ${subtaskDescr.result}`}</div>}
-      </div>
-    </Tooltip>
+  
+      <Tooltip id="subtask-prompt" style={{position:"fixed"}}>
+        <div className='text-start' style={{ whiteSpace: 'nowrap' }}>
+          <div className='mb-1'>{subtaskDescr.name}</div>
+          {subtaskDescr.description && <div className='mb-1'>{`Описание: ${subtaskDescr.description}`}</div>}
+          {subtaskDescr.result && <div className='mb-1'>{`Результат: ${subtaskDescr.result}`}</div>}
+        </div>
+      </Tooltip>
+    
   )
 
   if (subTaskList && subTaskList.length > 0)
@@ -28,6 +30,7 @@ export const SubTaskList: React.FC<SubTaskListProps> = ({ subTaskList }) => {
             <OverlayTrigger
               placement="bottom-start"
               overlay={toolTip(subTask)}
+            // show={true}
             >
               {({ ref, ...triggerHandler }) => (
                 <Form.Check type='checkbox'>

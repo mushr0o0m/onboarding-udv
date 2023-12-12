@@ -1,6 +1,6 @@
 import React from 'react';
 import { TaskList } from './TaskList';
-import { TodoProvider } from '../../../utils';
+import { TodoProvider } from '../../../utils/indext';
 import { BtnController } from './BtnController';
 import { TitlePageComponent } from '../../../components/TitlePageComponent';
 

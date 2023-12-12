@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navbar, Nav, Image, Container, NavDropdown, Col } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../utils';
+import { useAuth } from '../../utils/indext';
 
 
 interface NavbarComponentProps {
