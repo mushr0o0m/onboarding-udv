@@ -20,21 +20,21 @@ class TasksListView(APIView):
         except:
             raise Http404
         if worker.is_first_day:
-            tasks = Task.objects.filter(worker_id=worker.id)[:8]
+            tasks = Task.objects.filter(worker_id=worker.id)[:FIRST_DAY_TASKS_LEN]
             tasks_list = []
             count_completed_task = 0
             for task in tasks:
                 if task.is_completed:
                     count_completed_task += 1
                 tasks_list.append(TasksReadSerializer(task).data)
-            progress = count_completed_task / 8
+            progress = count_completed_task / FIRST_DAY_TASKS_LEN
             return Response({'tasks': tasks_list, 'bar_max': 1.0, 'bar': progress})
 
         else:
             tasks = Task.objects.filter(worker_id=worker.id)
 
             task_coef = 1 / len(tasks)
-            subtask_coef = 1 / 20
+            subtask_coef = 1 / SUBTASKS_MAX_COUNT
             progress = 0
 
             tasks_list = []
@@ -49,8 +49,10 @@ class TasksListView(APIView):
                     for subtask in subtasks:
                         if subtask.is_completed:
                             count_completed_subtask += 1
-                        subtasks_list.append(SubtaskReadSerializer(subtask).data)
                     progress += count_completed_subtask * subtask_coef * task_coef
+
+                for subtask in subtasks:
+                    subtasks_list.append(SubtaskReadSerializer(subtask).data)
 
                 task_dict = {'id': task.id,
                              'worker_id': task.worker_id,
@@ -65,7 +67,7 @@ class TasksListView(APIView):
             task = Task.objects.get(id=request.data['task_id'])
         except:
             return HttpResponseBadRequest("We cannot process the request. Not such task")
-        if len(Subtask.objects.filter(id=task.id)) == 20:
+        if len(Subtask.objects.filter(task_id=task.id)) >= SUBTASKS_MAX_COUNT:
             return HttpResponseBadRequest("We cannot process the request. You can have only 20 subtask on each task")
         request_data = request.data
         request_data.update({"is_completed": False})
@@ -80,11 +82,17 @@ class TasksListView(APIView):
             instance = Subtask.objects.get(pk=pk)
         except:
             raise Http404
+        if instance.task_id != request.data['task_id']:
+            another_subtasks = Subtask.objects.filter(task_id=request.data['task_id'])
+            if len(another_subtasks) >= SUBTASKS_MAX_COUNT:
+                return HttpResponseBadRequest('task with task_id=' + str(request.data['task_id']) + ' already have ' +
+                                              str(SUBTASKS_MAX_COUNT) + ' subtasks')
 
         serializer = SubtaskSerializer(data=request.data, instance=instance)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({'post': serializer.data})
+        inst = serializer.save()
+
+        return Response({'post': SubtaskReadSerializer(inst).data})
 
     def patch(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
@@ -92,10 +100,20 @@ class TasksListView(APIView):
             instance = Subtask.objects.get(pk=pk)
         except:
             raise Http404
-        instance.is_completed = bool(request.data['is_completed'])
+        is_completed = bool(request.data['is_completed'])
+        instance.is_completed = is_completed
         instance.save()
-
-        return Response({'post': SubtaskSerializer(instance).data})
+        if is_completed:
+            another_subtasks_in_task = Subtask.objects.filter(task_id=instance.task_id)
+            is_all_completed = True
+            for subtask in another_subtasks_in_task:
+                if not subtask.is_completed:
+                    is_all_completed = False
+            if is_all_completed and len(another_subtasks_in_task) >= SUBTASKS_MAX_COUNT:
+                task = Task.objects.get(id=instance.task_id)
+                task.is_completed = True
+                task.save()
+        return Response({'post': SubtaskReadSerializer(instance).data})
 
     def delete(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
@@ -173,8 +191,8 @@ class WorkerView(APIView):
         pwo.minnumbers = 1
         pwo.minschars = 1
         password = pwo.generate()'''
-
-        user = User.objects.create_user(email=data['email'], password='AB133777')  # password)
+        password = 'AB133777'
+        user = User.objects.create_user(email=data['email'], password=password)
 
         '''send_mail('Регистрация на сервисе для онбординга UDV',
                   'Похоже вы недавно устроились на работу в UDV, поздравляем! Ваш Hr, ' + str(hr.name) +
@@ -388,7 +406,7 @@ class TaskView(APIView):
             if worker.is_first_day:
                 instance.is_completed = is_completed_row
                 instance.save()
-                tasks = Task.objects.filter(worker_id=worker.id)[:8]
+                tasks = Task.objects.filter(worker_id=worker.id)[:FIRST_DAY_TASKS_LEN]
                 is_all_completed = True
                 for task in tasks:
                     if not task.is_completed:
@@ -535,20 +553,23 @@ class ProjectView(APIView):
 class FirstDayView(APIView):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get("pk", None)
-        if not pk:
-            worker = Worker.objects.get(user_id=request.user.id)
-        else:
-            worker = Worker.objects.get(pk=pk)
+        try:
+            if not pk:
+                worker = Worker.objects.get(user_id=request.user.id)
+            else:
+                worker = Worker.objects.get(pk=pk)
+        except:
+            raise Http404
 
         if worker.is_first_day:
-            tasks = Task.objects.filter(worker_id=worker.id)[:8]
+            tasks = Task.objects.filter(worker_id=worker.id)[:FIRST_DAY_TASKS_LEN]
             tasks_list = []
             count_completed_task = 0
             for task in tasks:
                 if task.is_completed:
                     count_completed_task += 1
                 tasks_list.append(TasksReadSerializer(task).data)
-            progress = count_completed_task / 8
+            progress = count_completed_task / FIRST_DAY_TASKS_LEN
             return Response({'tasks': tasks_list, 'bar_max': 1.0, 'bar': progress})
         else:
             return HttpResponseBadRequest('your first day is completed')
@@ -564,7 +585,7 @@ class FirstDayView(APIView):
         if worker.is_first_day:
             instance.is_completed = True
             instance.save()
-            tasks = Task.objects.filter(worker_id=worker.id)[:8]
+            tasks = Task.objects.filter(worker_id=worker.id)[:FIRST_DAY_TASKS_LEN]
             is_all_completed = True
             for task in tasks:
                 if not task.is_completed:
