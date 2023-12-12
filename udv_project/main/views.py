@@ -27,14 +27,14 @@ class TasksListView(APIView):
                 if task.is_completed:
                     count_completed_task += 1
                 tasks_list.append(TasksReadSerializer(task).data)
-            progress = count_completed_task/8
+            progress = count_completed_task / 8
             return Response({'tasks': tasks_list, 'bar_max': 1.0, 'bar': progress})
 
         else:
             tasks = Task.objects.filter(worker_id=worker.id)
 
-            task_coef = 1/len(tasks)
-            subtask_coef = 1/20
+            task_coef = 1 / len(tasks)
+            subtask_coef = 1 / 20
             progress = 0
 
             tasks_list = []
@@ -50,7 +50,7 @@ class TasksListView(APIView):
                         if subtask.is_completed:
                             count_completed_subtask += 1
                         subtasks_list.append(SubtaskReadSerializer(subtask).data)
-                    progress += count_completed_subtask*subtask_coef*task_coef
+                    progress += count_completed_subtask * subtask_coef * task_coef
 
                 task_dict = {'id': task.id,
                              'worker_id': task.worker_id,
@@ -65,6 +65,8 @@ class TasksListView(APIView):
             task = Task.objects.get(id=request.data['task_id'])
         except:
             return HttpResponseBadRequest("We cannot process the request. Not such task")
+        if len(Subtask.objects.filter(id=task.id)) == 20:
+            return HttpResponseBadRequest("We cannot process the request. You can have only 20 subtask on each task")
         request_data = request.data
         request_data.update({"is_completed": False})
         serializer = SubtaskSerializer(data=request_data)
@@ -292,19 +294,19 @@ class WorkerView(APIView):
                          'is_completed': task.is_completed,
                          'subtasks': subtasks_list}
             tasks_list.append(TasksListSerializer(task_dict).data)
+        if 'tasks' in request.data.keys():
+            for row_task in request.data['tasks']:
+                row_task.update({"worker_id": worker.id, "is_completed": False})
+                serializer_task = TasksSerializer(data=row_task)
+                serializer_task.is_valid(raise_exception=True)
+                task = serializer_task.save()
+                task_dict = {'id': task.id,
+                             'worker_id': task.worker_id,
+                             'name': task.name,
+                             'is_completed': task.is_completed,
+                             'subtasks': []}
 
-        for row_task in request.data['tasks']:
-            row_task.update({"worker_id": worker.id, "is_completed": False})
-            serializer_task = TasksSerializer(data=row_task)
-            serializer_task.is_valid(raise_exception=True)
-            task = serializer_task.save()
-            task_dict = {'id': task.id,
-                         'worker_id': task.worker_id,
-                         'name': task.name,
-                         'is_completed': task.is_completed,
-                         'subtasks': []}
-
-            tasks_list.append(TasksListSerializer(task_dict).data)
+                tasks_list.append(TasksListSerializer(task_dict).data)
 
         serializer_contact = ContactSerializer(data=request.data, instance=worker)
         serializer_contact.is_valid(raise_exception=True)
@@ -317,6 +319,7 @@ class WorkerView(APIView):
                                                     'hr_id': worker.hr_id,
                                                     'jobTitle': worker.jobTitle,
                                                     'employmentDate': worker.employmentDate,
+                                                    'is_first_day': worker.is_first_day,
                                                     'email': user.email,
                                                     'user_id': user.id,
                                                     'tasks': tasks_list}).data,
@@ -527,3 +530,60 @@ class ProjectView(APIView):
             raise Http404
         instance.delete()
         return Response({'delete': 'ok'})
+
+
+class FirstDayView(APIView):
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            worker = Worker.objects.get(user_id=request.user.id)
+        else:
+            worker = Worker.objects.get(pk=pk)
+
+        if worker.is_first_day:
+            tasks = Task.objects.filter(worker_id=worker.id)[:8]
+            tasks_list = []
+            count_completed_task = 0
+            for task in tasks:
+                if task.is_completed:
+                    count_completed_task += 1
+                tasks_list.append(TasksReadSerializer(task).data)
+            progress = count_completed_task / 8
+            return Response({'tasks': tasks_list, 'bar_max': 1.0, 'bar': progress})
+        else:
+            return HttpResponseBadRequest('your first day is completed')
+
+    def patch(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        try:
+            instance = Task.objects.get(pk=pk)
+        except:
+            raise Http404
+
+        worker = Worker.objects.get(id=instance.worker_id)
+        if worker.is_first_day:
+            instance.is_completed = True
+            instance.save()
+            tasks = Task.objects.filter(worker_id=worker.id)[:8]
+            is_all_completed = True
+            for task in tasks:
+                if not task.is_completed:
+                    is_all_completed = False
+            if is_all_completed:
+                worker.is_first_day = False
+                for task in tasks:
+                    task.delete()
+                worker.save()
+        else:
+            subtasks = Subtask.objects.filter(task_id=instance.id)
+            is_subtasks_completed = True
+            for subtask in subtasks:
+                if not subtask.is_completed:
+                    is_subtasks_completed = False
+            if is_subtasks_completed:
+                instance.is_completed = is_completed_row
+                instance.save()
+            else:
+                return HttpResponseBadRequest("We cannot process the request. Cannot cancel completed task with "
+                                              "uncompleted subtasks")
+        return Response({'post': TasksSerializer(instance).data})
