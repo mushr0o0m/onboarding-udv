@@ -256,7 +256,10 @@ class WorkerView(APIView):
             user = User.objects.get(id=worker.user_id)
         except:
             raise Http404
-        tasks = Task.objects.filter(worker_id=worker.id)
+        if worker.is_first_day:
+            tasks = Task.objects.filter(worker_id=worker.id)[FIRST_DAY_TASKS_LEN:]
+        else:
+            tasks = Task.objects.filter(worker_id=worker.id)
         tasks_list = []
 
         for task in tasks:
