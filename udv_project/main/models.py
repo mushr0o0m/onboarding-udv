@@ -101,6 +101,7 @@ class Worker(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, verbose_name="Аккаунт пользователя")
     jobTitle = models.CharField(max_length=100, default="")
     employmentDate = models.DateField(null=True)
+    is_first_day = models.BooleanField(default=False)
 
     def __int__(self):
         return self.id
@@ -139,3 +140,10 @@ class Contact(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Project(models.Model):
+    name = models.CharField(max_length=100, default="")
+    description = models.CharField(max_length=100, null=True)
+    desk_link = models.CharField(max_length=100, null=True)
+    contacts = models.ManyToManyField(Contact, blank=True)

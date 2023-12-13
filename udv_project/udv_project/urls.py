@@ -48,4 +48,9 @@ urlpatterns = [
 
     path('api/contacts/', ContactView.as_view()),
     path('api/contacts/<int:pk>/', ContactView.as_view()),
+
+    path('api/projects/', ProjectView.as_view()),
+    path('api/projects/<int:pk>/', ProjectView.as_view()),
+    path('api/first_day/', FirstDayView.as_view()),
+    path('api/first_day/<int:pk>/', FirstDayView.as_view()),
 ]
