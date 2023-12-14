@@ -139,14 +139,14 @@ class ProjectReadSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
     description = serializers.CharField()
-    desk_link = serializers.CharField()
+    deskLink = serializers.CharField()
     contacts = ContactReadSerializer(read_only=True, many=True)
 
 
 class ProjectSerializer(serializers.Serializer):
     name = serializers.CharField()
     description = serializers.CharField()
-    desk_link = serializers.CharField()
+    deskLink = serializers.CharField()
 
     def create(self, validated_data):
         return Project.objects.create(**validated_data)
@@ -154,7 +154,7 @@ class ProjectSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         instance.name = validated_data["name"]
         instance.description = validated_data["description"]
-        instance.desk_link = validated_data["desk_link"]
+        instance.deskLink = validated_data["deskLink"]
         instance.save()
         return instance
 

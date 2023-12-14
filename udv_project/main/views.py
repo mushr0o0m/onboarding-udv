@@ -515,7 +515,7 @@ class ProjectView(APIView):
         serializer = ProjectSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         inst = serializer.save()
-        for contact_id in request.data["contacts_ids"]:
+        for contact_id in request.data["contactsIds"]:
             try:
                 contact = Contact.objects.get(id=contact_id)
             except:
@@ -534,7 +534,7 @@ class ProjectView(APIView):
         serializer.is_valid(raise_exception=True)
         project = serializer.save()
         project.contacts.clear()
-        for contact_id in request.data["contacts_ids"]:
+        for contact_id in request.data["contactsIds"]:
             try:
                 contact = Contact.objects.get(id=contact_id)
             except:
