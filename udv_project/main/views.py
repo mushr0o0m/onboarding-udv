@@ -256,7 +256,10 @@ class WorkerView(APIView):
             user = User.objects.get(id=worker.user_id)
         except:
             raise Http404
-        tasks = Task.objects.filter(worker_id=worker.id)
+        if worker.is_first_day:
+            tasks = Task.objects.filter(worker_id=worker.id)[FIRST_DAY_TASKS_LEN:]
+        else:
+            tasks = Task.objects.filter(worker_id=worker.id)
         tasks_list = []
 
         for task in tasks:
@@ -512,7 +515,7 @@ class ProjectView(APIView):
         serializer = ProjectSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         inst = serializer.save()
-        for contact_id in request.data["contacts_ids"]:
+        for contact_id in request.data["contactsIds"]:
             try:
                 contact = Contact.objects.get(id=contact_id)
             except:
@@ -531,7 +534,7 @@ class ProjectView(APIView):
         serializer.is_valid(raise_exception=True)
         project = serializer.save()
         project.contacts.clear()
-        for contact_id in request.data["contacts_ids"]:
+        for contact_id in request.data["contactsIds"]:
             try:
                 contact = Contact.objects.get(id=contact_id)
             except:
