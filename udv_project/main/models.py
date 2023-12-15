@@ -83,9 +83,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Hr(models.Model):
-    name = models.CharField(max_length=100)
-    surname = models.CharField(max_length=100, default="")
-    patronymic = models.CharField(max_length=100, default="")
+    name = models.CharField(max_length=100, blank=True, null=True)
+    surname = models.CharField(max_length=100, default="", blank=True, null=True)
+    patronymic = models.CharField(max_length=100, default="", blank=True, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, verbose_name="Аккаунт пользователя")
 
     def __int__(self):
@@ -93,13 +93,13 @@ class Hr(models.Model):
 
 
 class Worker(models.Model):
-    name = models.CharField(max_length=100, default="")
-    surname = models.CharField(max_length=100, default="")
-    patronymic = models.CharField(max_length=100, default="")
-    telegram = models.CharField(max_length=100, default="")
+    name = models.CharField(max_length=100, default="", blank=True, null=True)
+    surname = models.CharField(max_length=100, default="", blank=True, null=True)
+    patronymic = models.CharField(max_length=100, default="", blank=True, null=True)
+    telegram = models.CharField(max_length=100, default="", blank=True, null=True)
     hr_id = models.ForeignKey(Hr, on_delete=models.CASCADE, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, verbose_name="Аккаунт пользователя")
-    jobTitle = models.CharField(max_length=100, default="")
+    jobTitle = models.CharField(max_length=100, default="", blank=True, null=True)
     employmentDate = models.DateField(null=True)
     is_first_day = models.BooleanField(default=False)
 
@@ -123,7 +123,7 @@ class Subtask(models.Model):
     task_id = models.ForeignKey(Task, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=10000, null=True, blank=True)
-    result = models.CharField(max_length=100, null=True)
+    result = models.CharField(max_length=100, blank=True, null=True)
     is_completed = models.BooleanField()
 
     def __str__(self):
@@ -133,10 +133,10 @@ class Subtask(models.Model):
 class Contact(models.Model):
     telegram = models.CharField(max_length=100, null=True)
     email = models.CharField(max_length=100, null=True)
-    jobTitle = models.CharField(max_length=100, null=True)
-    name = models.CharField(max_length=100, default="")
-    surname = models.CharField(max_length=100, default="")
-    patronymic = models.CharField(max_length=100, default="")
+    jobTitle = models.CharField(max_length=100, blank=True, null=True)
+    name = models.CharField(max_length=100, default="", blank=True, null=True)
+    surname = models.CharField(max_length=100, default="", blank=True, null=True)
+    patronymic = models.CharField(max_length=100, default="", blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -144,6 +144,6 @@ class Contact(models.Model):
 
 class Project(models.Model):
     name = models.CharField(max_length=100, default="")
-    description = models.CharField(max_length=100, null=True)
-    deskLink = models.CharField(max_length=100, null=True)
+    description = models.CharField(max_length=100, blank=True, null=True)
+    deskLink = models.CharField(max_length=100, blank=True, null=True)
     contacts = models.ManyToManyField(Contact, blank=True)
