@@ -102,6 +102,12 @@ class Worker(models.Model):
     jobTitle = models.CharField(max_length=100, default="", blank=True, null=True)
     employmentDate = models.DateField(null=True)
     is_first_day = models.BooleanField(default=False)
+    is_back = models.BooleanField(default=False)
+    is_table = models.BooleanField(default=False)
+    is_computer = models.BooleanField(default=False)
+    is_chair = models.BooleanField(default=False)
+    stars = models.DecimalField(default=0.0, max_digits=5, decimal_places=2)
+    u_coins = models.DecimalField(default=0.0, max_digits=5, decimal_places=2)
 
     def __int__(self):
         return self.id

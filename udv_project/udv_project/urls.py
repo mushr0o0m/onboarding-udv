@@ -53,4 +53,6 @@ urlpatterns = [
     path('api/projects/<int:pk>/', ProjectView.as_view()),
     path('api/first_day/', FirstDayView.as_view()),
     path('api/first_day/<int:pk>/', FirstDayView.as_view()),
+    path('api/game/', GameView.as_view()),
+    path('api/game/<int:game_object>/', GameView.as_view()),
 ]

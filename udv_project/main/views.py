@@ -11,6 +11,7 @@ from django.core.mail import send_mail
 from password_generator import PasswordGenerator
 from django.http import Http404
 from django.http import HttpResponseBadRequest
+import decimal
 
 
 class TasksListView(APIView):
@@ -98,6 +99,7 @@ class TasksListView(APIView):
         pk = kwargs.get("pk", None)
         try:
             instance = Subtask.objects.get(pk=pk)
+            worker = Worker.objects.get(id=Task.objects.get(id=instance.task_id).worker_id)
         except:
             raise Http404
         is_completed = bool(request.data['is_completed'])
@@ -113,6 +115,8 @@ class TasksListView(APIView):
                 task = Task.objects.get(id=instance.task_id)
                 task.is_completed = True
                 task.save()
+            worker.stars += decimal.Decimal((300/len(Task.objects.filter(worker_id=worker.id)))/SUBTASKS_MAX_COUNT)
+            worker.save()
         return Response({'post': SubtaskReadSerializer(instance).data})
 
     def delete(self, request, *args, **kwargs):
@@ -401,14 +405,16 @@ class TaskView(APIView):
         pk = kwargs.get("pk", None)
         try:
             instance = Task.objects.get(pk=pk)
+            worker = Worker.objects.get(id=instance.worker_id)
         except:
             raise Http404
         is_completed_row = bool(request.data['is_completed'])
         if is_completed_row:
-            worker = Worker.objects.get(id=instance.worker_id)
             if worker.is_first_day:
                 instance.is_completed = is_completed_row
                 instance.save()
+                worker.stars += decimal.Decimal(12.5)
+                worker.save()
                 tasks = Task.objects.filter(worker_id=worker.id)[:FIRST_DAY_TASKS_LEN]
                 is_all_completed = True
                 for task in tasks:
@@ -428,6 +434,9 @@ class TaskView(APIView):
                 if is_subtasks_completed:
                     instance.is_completed = is_completed_row
                     instance.save()
+                    worker.stars += decimal.Decimal((SUBTASKS_MAX_COUNT - len(subtasks))*(
+                            (300/len(Task.objects.filter(worker_id=worker.id)))/SUBTASKS_MAX_COUNT))
+                    worker.save()
                 else:
                     return HttpResponseBadRequest("We cannot process the request. Cannot cansel completed task with "
                                                   "uncompleted subtasks")
@@ -611,3 +620,71 @@ class FirstDayView(APIView):
                 return HttpResponseBadRequest("We cannot process the request. Cannot cancel completed task with "
                                               "uncompleted subtasks")
         return Response({'post': TasksSerializer(instance).data})
+
+
+class GameView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            worker = Worker.objects.get(user_id=request.user.id)
+        except:
+            raise Http404
+        return Response({'ordinaryBack': int(not worker.is_back),
+                         'ordinaryTable': int(not worker.is_table),
+                         'ordinaryComputer': int(not worker.is_computer),
+                         'ordinaryChair': int(not worker.is_chair),
+                         'cosmosBack': int(worker.is_back),
+                         'cosmosTable': int(worker.is_table),
+                         'cosmosComputer': int(worker.is_computer),
+                         'cosmosChair': int(worker.is_chair),
+                         'buttonBack': 'disabled' if worker.is_back else '',
+                         'buttonTable': 'disabled' if worker.is_table else '',
+                         'buttonComputer': 'disabled' if worker.is_computer else '',
+                         'buttonChair': 'disabled' if worker.is_chair else '',
+                         'progress': worker.u_coins/12,
+                         'max': 1.0,
+                         'count_stars': int(worker.stars),
+                         'count_ucoins': int(worker.u_coins)
+                         })
+
+    def put(self, request, *args, **kwargs):
+        game_object = kwargs.get("game_object", None)
+        if 1 > game_object > 4:
+            raise Http404
+        try:
+            worker = Worker.objects.get(user_id=request.user.id)
+        except:
+            raise Http404
+        if worker.stars < 100:
+            return HttpResponseBadRequest('you do not have enough stars')
+
+        if game_object == 1:
+            worker.is_back = True
+        if game_object == 2:
+            worker.is_table = True
+        if game_object == 3:
+            worker.is_computer = True
+        if game_object == 4:
+            worker.is_chair = True
+
+        worker.stars -= 100
+        worker.u_coins += 3
+        worker.save()
+        return Response({'ordinaryBack': int(not worker.is_back),
+                         'ordinaryTable': int(not worker.is_table),
+                         'ordinaryComputer': int(not worker.is_computer),
+                         'ordinaryChair': int(not worker.is_chair),
+                         'cosmosBack': int(worker.is_back),
+                         'cosmosTable': int(worker.is_table),
+                         'cosmosComputer': int(worker.is_computer),
+                         'cosmosChair': int(worker.is_chair),
+                         'buttonBack': 'disabled' if worker.is_back else '',
+                         'buttonTable': 'disabled' if worker.is_table else '',
+                         'buttonComputer': 'disabled' if worker.is_computer else '',
+                         'buttonChair': 'disabled' if worker.is_chair else '',
+                         'progress': worker.u_coins/12,
+                         'max': 1.0,
+                         'count_stars': int(worker.stars),
+                         'count_ucoins': int(worker.u_coins)
+                         })
+
+
