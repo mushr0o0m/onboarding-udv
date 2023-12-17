@@ -115,7 +115,7 @@ class TasksListView(APIView):
                 task = Task.objects.get(id=instance.task_id)
                 task.is_completed = True
                 task.save()
-            worker.stars += decimal.Decimal((300/len(Task.objects.filter(worker_id=worker.id)))/SUBTASKS_MAX_COUNT)
+            worker.stars += decimal.Decimal((MAIN_TASKS_STARS / len(Task.objects.filter(worker_id=worker.id))) / SUBTASKS_MAX_COUNT)
             worker.save()
         return Response({'post': SubtaskReadSerializer(instance).data})
 
@@ -413,7 +413,7 @@ class TaskView(APIView):
             if worker.is_first_day:
                 instance.is_completed = is_completed_row
                 instance.save()
-                worker.stars += decimal.Decimal(12.5)
+                worker.stars += decimal.Decimal(FIRST_DAY_TASKS_STARS/FIRST_DAY_TASKS_LEN)
                 worker.save()
                 tasks = Task.objects.filter(worker_id=worker.id)[:FIRST_DAY_TASKS_LEN]
                 is_all_completed = True
@@ -435,7 +435,7 @@ class TaskView(APIView):
                     instance.is_completed = is_completed_row
                     instance.save()
                     worker.stars += decimal.Decimal((SUBTASKS_MAX_COUNT - len(subtasks))*(
-                            (300/len(Task.objects.filter(worker_id=worker.id)))/SUBTASKS_MAX_COUNT))
+                            (MAIN_TASKS_STARS/len(Task.objects.filter(worker_id=worker.id)))/SUBTASKS_MAX_COUNT))
                     worker.save()
                 else:
                     return HttpResponseBadRequest("We cannot process the request. Cannot cansel completed task with "
@@ -640,7 +640,7 @@ class GameView(APIView):
                          'buttonTable': 'disabled' if worker.is_table else '',
                          'buttonComputer': 'disabled' if worker.is_computer else '',
                          'buttonChair': 'disabled' if worker.is_chair else '',
-                         'progress': worker.u_coins/12,
+                         'progress': worker.u_coins/(REWARD*COUNT_ITEMS),
                          'max': 1.0,
                          'count_stars': int(worker.stars),
                          'count_ucoins': int(worker.u_coins)
@@ -648,13 +648,13 @@ class GameView(APIView):
 
     def put(self, request, *args, **kwargs):
         game_object = kwargs.get("game_object", None)
-        if 1 > game_object > 4:
+        if 1 > game_object > COUNT_ITEMS:
             raise Http404
         try:
             worker = Worker.objects.get(user_id=request.user.id)
         except:
             raise Http404
-        if worker.stars < 100:
+        if worker.stars < ITEM_COST:
             return HttpResponseBadRequest('you do not have enough stars')
 
         if game_object == 1:
@@ -666,8 +666,8 @@ class GameView(APIView):
         if game_object == 4:
             worker.is_chair = True
 
-        worker.stars -= 100
-        worker.u_coins += 3
+        worker.stars -= ITEM_COST
+        worker.u_coins += REWARD
         worker.save()
         return Response({'ordinaryBack': int(not worker.is_back),
                          'ordinaryTable': int(not worker.is_table),
@@ -681,7 +681,7 @@ class GameView(APIView):
                          'buttonTable': 'disabled' if worker.is_table else '',
                          'buttonComputer': 'disabled' if worker.is_computer else '',
                          'buttonChair': 'disabled' if worker.is_chair else '',
-                         'progress': worker.u_coins/12,
+                         'progress': worker.u_coins/(REWARD * COUNT_ITEMS),
                          'max': 1.0,
                          'count_stars': int(worker.stars),
                          'count_ucoins': int(worker.u_coins)
