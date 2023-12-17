@@ -3,7 +3,7 @@ import { ProjectCard } from './ProjectCard';
 
 interface ProjectListProps {
   projects: Project[];
-  deleteProject: (id: Project['id']) => void;
+  deleteProject?: (id: Project['id']) => void;
 }
 
 export const ProjectList: React.FC<ProjectListProps> = ({ projects, deleteProject }) => {

@@ -12,7 +12,7 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
   const [tasks, setTasks] = React.useState<Task[]>([]);
   const [firstDayTasks, setFirstDayTasks] = React.useState<Task[]>([])
   const [isFirstDayFinish, setIsFirstDayFinish] = React.useState<boolean>(false);
-  const { token, userType } = useAuth();
+  const { token, userType, signOut } = useAuth();
 
   React.useEffect(() => {
     const fetchTaskList = async () => {
@@ -43,7 +43,7 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
     if (token && userType === 'WR') {
       fetchFDTaskList();
     }
-  }, [token, userType]);
+  }, [token, userType, signOut]);
 
   React.useEffect(() => {
     const checkIsFirstDayFinished = (() => {
@@ -54,7 +54,6 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
           return
         }
       });
-      console.log('checkIsFirstDayFinished', result, firstDayTasks)
       setIsFirstDayFinish(result);
     });
 
@@ -159,6 +158,10 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
     });
   };
 
+  const clearFirstDayTasks = (() => {
+    setFirstDayTasks([]);
+  })
+
   const value = {
     tasks,
     addSubTaskToTask,
@@ -170,6 +173,7 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
     firstDayTasks,
     markFirstDayTask,
     isFirstDayFinish,
+    clearFirstDayTasks,
   };
 
   return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;

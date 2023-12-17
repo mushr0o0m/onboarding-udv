@@ -24,7 +24,9 @@ export const AppRouter: React.FC = () => {
             <ApprenticeMainPage />
           </RequireAuth>
         } >
-          <Route index element={<ApprenticeFirstDayPage />} />
+          <Route index element={
+            <RequireFinisedFirsDay fallback='criteria'><ApprenticeFirstDayPage /></RequireFinisedFirsDay>
+          } />
           <Route path='criteria' element={
             <RequireFinisedFirsDay fallback='/apprentice'><ApprenticeTodoPage /></RequireFinisedFirsDay>
           } />

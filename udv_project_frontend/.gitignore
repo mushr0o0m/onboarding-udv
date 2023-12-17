@@ -73,5 +73,3 @@ coverage.xml
 *.sw*
 manage.py
 
-# example database
-drf_example

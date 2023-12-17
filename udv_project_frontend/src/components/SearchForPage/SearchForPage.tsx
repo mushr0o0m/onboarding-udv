@@ -5,15 +5,15 @@ import { Link } from "react-router-dom";
 interface SearchForPageProps {
   handleSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   searchQuery: string;
-  addBtnText: string;
-  addBtnTo: string;
+  addBtnText?: string;
+  addBtnTo?: string;
 }
 
-export const SearchForPage: React.FC<SearchForPageProps> = ({searchQuery, handleSearchChange, addBtnText, addBtnTo}) => {
+export const SearchForPage: React.FC<SearchForPageProps> = ({ searchQuery, handleSearchChange, addBtnText, addBtnTo }) => {
 
   return (
     <Row className="py-3">
-      <Col sm={8} >
+      <Col sm={addBtnText && addBtnTo ? 8 : 12} >
         <InputGroup size="lg">
           <Form.Control
             placeholder="Поиск"
@@ -24,9 +24,10 @@ export const SearchForPage: React.FC<SearchForPageProps> = ({searchQuery, handle
           />
         </InputGroup>
       </Col>
-      <Col sm={4} className="d-flex justify-content-end">
-        <Link to={addBtnTo} className="btn btn-bd-primary btn-lg">{addBtnText}</Link>
-      </Col>
+      {addBtnText && addBtnTo &&
+        <Col sm={4} className="d-flex justify-content-end">
+          <Link to={addBtnTo} className="btn btn-bd-primary btn-lg">{addBtnText}</Link>
+        </Col>}
     </Row>
   )
 }

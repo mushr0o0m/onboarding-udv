@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTodo } from '../../utils/indext';
 import { Navigate } from 'react-router-dom';
+import { ApprenticeFirstDayPage } from '../../pages/ApprenticePages/ApprenticeFirstDayPage/ApprenticeFirstDayPage';
 
 interface RequireFinisedFirsDayProps {
   children: React.ReactElement;
@@ -9,11 +10,10 @@ interface RequireFinisedFirsDayProps {
 
 export const RequireFinisedFirsDay: React.FC<RequireFinisedFirsDayProps> = ({ children, fallback }) => {
 
-  const { isFirstDayFinish } = useTodo();
+  const { isFirstDayFinish, firstDayTasks } = useTodo();
 
-  console.log('FinisedFirstDay', isFirstDayFinish)
-
-  if (isFirstDayFinish === false) {
+  if (children.type != ApprenticeFirstDayPage && !isFirstDayFinish 
+    || children.type === ApprenticeFirstDayPage && firstDayTasks.length === 0) {
     return <Navigate to={fallback} replace />;
   }
 

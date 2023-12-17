@@ -11,6 +11,7 @@ export interface TodoContextProps {
     editSubTask: (editedSubtask: SubTask) => void;
     checkSubtasks: (taskId: Task['id']) => boolean;
     markFirstDayTask: (taskId: Task['id']) => void;
+    clearFirstDayTasks: () => void;
 }
 
 export const TodoContext = React.createContext<TodoContextProps>({
@@ -24,4 +25,5 @@ export const TodoContext = React.createContext<TodoContextProps>({
     editSubTask: () => {},
     checkSubtasks: () => false,
     markFirstDayTask: () => {},
+    clearFirstDayTasks: () => {}
 });
