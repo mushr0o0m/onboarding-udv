@@ -1,8 +1,8 @@
 import React from 'react';
-import { TitlePageComponent } from '../../../components/TitlePageComponent';
+import { TitlePageComponent } from '../../../components/TitlePage/TitlePageComponent';
 import { getFormatedDate, useHrStaff } from '../../../utils/indext';
-import { StaffSearch } from './components/StaffSearch';
 import { StaffCard } from './components/StaffCard';
+import { SearchForPage } from '../../../components/indext';
 
 
 export const HrStaffListPage: React.FC = () => {
@@ -41,7 +41,12 @@ export const HrStaffListPage: React.FC = () => {
     <>
       <TitlePageComponent titleName='Мои сотрудники' />
       <div className="container">
-        <StaffSearch handleSearchChange={handleSearchChange} searchQuery={searchQuery} />
+        <SearchForPage
+          handleSearchChange={handleSearchChange}
+          searchQuery={searchQuery}
+          addBtnTo='staff/create'
+          addBtnText='Добавить сотрудника'
+        />
         {noResults && <p>Пользователь не найден.</p>}
         {filteredStaff.map((employee) => <StaffCard
           key={employee.id}

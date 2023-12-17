@@ -1,5 +1,5 @@
 import React from 'react';
-import { TitlePageComponent } from '../../components/TitlePageComponent';
+import { TitlePageComponent } from '../../components/TitlePage/TitlePageComponent';
 import { Button, ListGroup } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DeleteConfirmationDialog } from '../../components/DeleteConfirmationDialog';
@@ -14,7 +14,7 @@ export const HrStaffProfile: React.FC = () => {
 
 
   React.useEffect(() => {
-    if(id)
+    if (id)
       setEmployeeId(id);
   }, [id, setEmployeeId]);
 
@@ -42,8 +42,15 @@ export const HrStaffProfile: React.FC = () => {
 
         <div className='mb-5'>
           <h4>Контакты:</h4>
-          <p className='d-inline'>Email: </p>
-          <span className="text-primary">{employee.email}</span>
+          <div>
+            <p className='d-inline'>Email: </p>
+            <span className="text-primary">{employee.email}</span>
+          </div>
+          {employee.telegram &&
+            <div>
+              <p className='d-inline'>Telegram: </p>
+              <span className="text-primary">{employee.telegram}</span>
+            </div>}
         </div>
 
         <div className='mb-5'>
@@ -69,6 +76,8 @@ export const HrStaffProfile: React.FC = () => {
 
         </div>
         <DeleteConfirmationDialog
+          title='Удалить сотрудника?'
+          description='Сотрудник действительно завершил адаптационный период?'
           show={modalShow}
           onHide={() => setModalShow(false)} onDelete={() => (onDelete())} />
       </section>

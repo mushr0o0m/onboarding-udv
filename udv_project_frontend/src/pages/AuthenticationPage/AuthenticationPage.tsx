@@ -5,28 +5,36 @@ import { useAuth } from '../../utils/indext';
 
 
 export const AuthenticationPage: React.FC = () => {
-
-
   const [userDetail, setUserDetail] = useState({ email: "", password: "" });
-  const [validatedForm, setValidatedForm] = useState<boolean | undefined>(undefined);
+  const [isBadRequest, setIsBadRequest] = useState<boolean>(false);
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn, userType } = useAuth();
+
+  React.useEffect(() => {
+    if (userType === 'HR') {
+      navigate("/hr");
+    } else if (userType === 'WR') {
+      navigate('/apprentice');
+    }
+  }, [navigate, userType]);
 
   const onSubmitData = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setValidatedForm(true);
     if (event.currentTarget.checkValidity()) {
       const user = {
         email: userDetail.email,
         password: userDetail.password
       }
-      signIn(user, (userType) => navigate(userType === 'HR' ? "/hr" : '/apprentice'))
+      signIn(user)
+        .catch(() => {
+          setIsBadRequest(true);
+        })
     }
   };
 
   const onValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserDetail({ ...userDetail, [e.target.name]: e.target.value });
-    // setValidatedForm(true);
+    setIsBadRequest(false);
   };
 
   return (
@@ -45,7 +53,7 @@ export const AuthenticationPage: React.FC = () => {
             </Modal.Title>
           </Modal.Header>
 
-          <Form method="post" noValidate validated={validatedForm} onSubmit={onSubmitData}>
+          <Form method="post" onSubmit={onSubmitData}>
             <Modal.Body className='p-4 pb-0'>
               <Form.Group className="mb-3" controlId="login">
                 <Form.Label>Логин</Form.Label>
@@ -53,9 +61,11 @@ export const AuthenticationPage: React.FC = () => {
                   type="email"
                   required
                   onChange={onValueChange}
-                  name="email" />
+                  name="email"
+                  isInvalid={isBadRequest}
+                />
               </Form.Group>
-              <Form.Group className="mb-3" controlId="password">
+              <Form.Group className="mb-5" controlId="password">
                 <Form.Label>Пароль</Form.Label>
                 <Form.Control value={userDetail.password}
                   type="password"
@@ -63,9 +73,13 @@ export const AuthenticationPage: React.FC = () => {
                   maxLength={12}
                   required
                   name="password"
-                  onChange={onValueChange} />
+                  onChange={onValueChange}
+                  isInvalid={isBadRequest}
+                />
               </Form.Group>
+              {isBadRequest && <p className='text-danger'>Пользователя с такой комбинацией логина и пароля не существует.</p>}
             </Modal.Body>
+
 
             <Modal.Footer className="border-top-0 justify-content-start p-4">
               <Button type='submit' variant='bd-primary' size="lg">Войти</Button>

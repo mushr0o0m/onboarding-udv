@@ -2,12 +2,14 @@ import React from "react";
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-interface StaffSearchProps {
+interface SearchForPageProps {
   handleSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   searchQuery: string;
+  addBtnText: string;
+  addBtnTo: string;
 }
 
-export const StaffSearch: React.FC<StaffSearchProps> = ({searchQuery, handleSearchChange}) => {
+export const SearchForPage: React.FC<SearchForPageProps> = ({searchQuery, handleSearchChange, addBtnText, addBtnTo}) => {
 
   return (
     <Row className="py-3">
@@ -23,7 +25,7 @@ export const StaffSearch: React.FC<StaffSearchProps> = ({searchQuery, handleSear
         </InputGroup>
       </Col>
       <Col sm={4} className="d-flex justify-content-end">
-        <Link to={'staff/create'} className="btn btn-bd-primary btn-lg">Добавить сотрудника</Link>
+        <Link to={addBtnTo} className="btn btn-bd-primary btn-lg">{addBtnText}</Link>
       </Col>
     </Row>
   )

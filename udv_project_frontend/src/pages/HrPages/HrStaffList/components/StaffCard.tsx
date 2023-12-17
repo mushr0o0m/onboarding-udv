@@ -33,6 +33,8 @@ export const StaffCard: React.FC<StaffCardProps> = ({ employee, formatedEmployme
             <Link className='me-3 align-top' to={`staff/${employee.id}/edit`} >Редактировать</Link>
             <CloseButton onClick={() => setModalShow(true)} />
             <DeleteConfirmationDialog
+              title='Удалить сотрудника?'
+              description='Сотрудник действительно завершил адаптационный период?'
               show={modalShow}
               onHide={() => setModalShow(false)} onDelete={() => (onDelete(employee.id))} />
           </div>

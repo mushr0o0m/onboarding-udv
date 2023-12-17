@@ -4,7 +4,6 @@ import { mapResponseTasksToTasks } from "../indext";
 export const mapResponseEmployeeToEmployee = (responseEmployee: ResponseEmployee): Employee =>
 ({
   ...responseEmployee,
-  telegramm: responseEmployee.telegram,
   employmentDate: new Date(responseEmployee.employmentDate),
   tasks: responseEmployee.tasks.map((task) => mapResponseTasksToTasks(task)) 
 });
@@ -14,7 +13,7 @@ export const mapEmployeeToResponseEmployee =
     Omit<ResponseEmployee, 'id' | 'tasks' | 'hr_id' | 'user_id'> & { tasks: Pick<Task, 'name'>[] } =>
   ({
     ...employee,
-    telegram: employee.telegramm || '',
+    telegram: employee.telegram || '',
     employmentDate: getFormatedDate(employee.employmentDate, "yyyy-MM-dd"),
     tasks: employee.tasks.map(task => ({ name: task.name }))
   });

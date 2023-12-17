@@ -18,6 +18,22 @@ export const getTaskList = async (token: string | null): Promise<Task[]> => {
   }
 };
 
+export const getFirstDayTasks = async (token: string | null): Promise<Task[]> => {
+  try {
+    const response = await axios.get(`${apiUrl}/api/first_day/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+  });
+    return response.data.tasks.map((task: ResponseTask) => mapResponseTasksToTasks(task));
+
+  } catch (error) {
+    if((error as AxiosError)?.response?.status != 400)
+      console.error('Get First Day Tasks Error:', (error as AxiosError)?.response || (error as Error).message);
+    throw error;
+  }
+};
+
 export const postSubtask = async (subtask: Omit<SubTask, 'id'>, token: string | null): Promise<SubTask> => {
   try {
     const response = await axios.post(`${apiUrl}/api/tasklist/`,
@@ -68,6 +84,20 @@ export const deleteSubtask = async (id: SubTask['id'], token: string | null) => 
   }
 };
 
+export const patchSubtask = async (id: SubTask['id'], checked: boolean, token: string | null) => {
+  try {
+    axios.patch(`${apiUrl}/api/tasklist/${id}/`, { is_completed: checked }, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+
+  } catch (error) {
+    console.error('Putch Subtask Error:', (error as AxiosError)?.response || (error as Error).message);
+    throw error;
+  }
+};
+
 export const patchTask = async (taskId: Task['id'], checked: boolean, token: string | null) => {
   try {
     axios.patch(`${apiUrl}/api/tasks/${taskId}/`, { is_completed: checked }, {
@@ -78,6 +108,20 @@ export const patchTask = async (taskId: Task['id'], checked: boolean, token: str
 
   } catch (error) {
     console.error('Putch Task Error:', (error as AxiosError)?.response || (error as Error).message);
+    throw error;
+  }
+};
+
+export const patchFirstDayTask = async (id: SubTask['id'], token: string | null) => {
+  try {
+    axios.patch(`${apiUrl}/api/first_day/${id}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    })
+
+  } catch (error) {
+    console.error('Putch First Day Task Error:', (error as AxiosError)?.response || (error as Error).message);
     throw error;
   }
 };

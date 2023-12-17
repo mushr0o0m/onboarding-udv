@@ -5,9 +5,11 @@ interface DeleteConfirmationDialogProps {
   show: boolean;
   onHide: () => void;
   onDelete: () => void;
+  title: string;
+  description: string;
 }
 
-export const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({show, onHide, onDelete}) => {
+export const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({show, onHide, onDelete, title, description}) => {
 
   const confirmDelete = (() => {
     onDelete();
@@ -23,14 +25,10 @@ export const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> =
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title className='text-danger' id="delete">
-          Удалить сотрудника?
-        </Modal.Title>
+        <Modal.Title className='text-danger' id="delete">{title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p className='text-danger'>
-          Сотрудник действительно завершил адаптационный период?
-        </p>
+        <p className='text-danger'>{description}</p>
       </Modal.Body>
       <Modal.Footer className='d-flex justify-content-between'>
         <Button variant='danger' onClick={() => confirmDelete()}>Да, удалить</Button>

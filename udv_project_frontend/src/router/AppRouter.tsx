@@ -8,29 +8,34 @@ import { ApprenticeTodoPage } from '../pages/ApprenticePages/ApprenticeTodoPage/
 import { HrStaffListPage } from '../pages/HrPages/HrStaffList/HrStaffListPage';
 import { HrStaffProfile } from '../pages/HrPages/HrStaffProfile';
 import { HrStaffProfileManager } from '../pages/HrPages/HrStaffProfileManager/HrStaffProfileManager';
-import { HrWrapperPage } from '../pages/HrPages/HrWrapperPage';
-import { HrProjectsPage } from '../pages/HrPages/HrProjectsPage';
-import { RequireAuth } from '../utils/RequireAuth';
-import { AuthProvider } from '../utils/contextes/AuthContext/AuthProvider';
+import { HrWrapperPage } from '../pages/HrPages/HrMainPage';
+import { HrProjectsPage } from '../pages/HrPages/HrProjects/HrProjectsPage';
+import { ApprenticeFirstDayPage } from '../pages/ApprenticePages/ApprenticeFirstDayPage/ApprenticeFirstDayPage';
+import { RequireAuth, RequireFinisedFirsDay } from './components/indext';
+import { HrProjectManagerPage } from '../pages/HrPages/HrProjectManager/indext';
 
 export const AppRouter: React.FC = () => {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
       <Routes>
         <Route path="/" element={<AuthenticationPage />} />
         <Route path="apprentice" element={
-          <RequireAuth>
+          <RequireAuth allowedUserType="WR">
             <ApprenticeMainPage />
           </RequireAuth>
         } >
-          <Route index element={<ApprenticeTodoPage />} />
-          <Route path="education" element={<ApprenticeEducationPage />} />
-          <Route path="office" element={<ApprenticeOfficePage />} />
+          <Route index element={<ApprenticeFirstDayPage />} />
+          <Route path='criteria' element={
+            <RequireFinisedFirsDay fallback='/apprentice'><ApprenticeTodoPage /></RequireFinisedFirsDay>
+          } />
+          <Route path="education" element={
+            <RequireFinisedFirsDay fallback='/apprentice'><ApprenticeEducationPage /></RequireFinisedFirsDay>} />
+          <Route path="office" element={
+            <RequireFinisedFirsDay fallback='/apprentice'><ApprenticeOfficePage /></RequireFinisedFirsDay>} />
         </Route>
 
         <Route path="hr" element={
-          <RequireAuth>
+          <RequireAuth allowedUserType="HR">
             <HrWrapperPage />
           </RequireAuth>
         } >
@@ -40,10 +45,10 @@ export const AppRouter: React.FC = () => {
           <Route path="staff/:id/edit" element={<HrStaffProfileManager />} />
           <Route path="staff/create" element={<HrStaffProfileManager />} />
           <Route path="projects" element={<HrProjectsPage />} />
+          <Route path="projects/create" element={<HrProjectManagerPage />} />
+          <Route path="projects/:id/edit" element={<HrProjectManagerPage />} />
         </Route>
       </Routes>
     </Router>
-    </AuthProvider>
-
   );
 };

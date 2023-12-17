@@ -1,5 +1,5 @@
 import React from 'react';
-import { TitlePageComponent } from '../../../components/TitlePageComponent';
+import { TitlePageComponent } from '../../../components/TitlePage/TitlePageComponent';
 
 export const ApprenticeOfficePage: React.FC = () => {
     return (

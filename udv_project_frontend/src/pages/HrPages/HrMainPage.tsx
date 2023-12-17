@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { NavbarComponent } from '../../components/Navbar/NavbarComponent';
-import { HrStaffProvider } from '../../utils/indext';
 
 export const HrWrapperPage: React.FC = () => {
 
@@ -13,10 +12,7 @@ export const HrWrapperPage: React.FC = () => {
   return (
     <>
       <NavbarComponent navs={navs} homeUrl='/hr/staff' userName={null} />
-      <HrStaffProvider>
-        <Outlet />
-      </HrStaffProvider>
-
+      <Outlet />
     </>
   );
 };

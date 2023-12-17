@@ -18,14 +18,14 @@ const DEFAULT_SUBTASK: Omit<SubTask, 'id'> = {
 };
 
 export const SubtaskManagerModal: React.FC<SubtaskManagerModalProps> = ({ show, onHide, isModeAdd }) => {
-  const { tasks, editSubTask, addSubTaskToTask } = useTodo();
+  const { tasks, editSubTask, addSubTaskToTask, checkSubtasks } = useTodo();
   const [parentTask, setParentTask] = React.useState<Task>();
   const [subtaskIdForEdit, setSubtaskIdForEdit] = React.useState(0);
   const [subTask, setSubTask] = React.useState(DEFAULT_SUBTASK);
 
   const selectParentTask = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const parentTaskId = parseInt(event.target.value);
-    setSubTask(prevSubtask => ({...prevSubtask, taskId: parentTaskId}));
+    setSubTask(prevSubtask => ({ ...prevSubtask, taskId: parentTaskId }));
     setParentTask(tasks.find((task: Task) => task.id === parentTaskId));
   };
 
@@ -56,12 +56,12 @@ export const SubtaskManagerModal: React.FC<SubtaskManagerModalProps> = ({ show, 
 
     closeModal();
     if (!isModeAdd) {
-      return editSubTask({...subTask, id: subtaskIdForEdit});
+      return editSubTask({ ...subTask, id: subtaskIdForEdit });
     }
     addSubTaskToTask(subTask);
   }
 
-  const resetUseStateHooks = () =>{
+  const resetUseStateHooks = () => {
     setSubTask(DEFAULT_SUBTASK);
     setSubtaskIdForEdit(0);
     setParentTask(undefined);
@@ -76,15 +76,15 @@ export const SubtaskManagerModal: React.FC<SubtaskManagerModalProps> = ({ show, 
     if (isModeAdd)
       return (
         <Form.Group className='mb-3' controlId="subtaskName" >
-          <Form.Label>Подзадача</Form.Label>
+          <Form.Label>Подзадача<i className="text-danger">*</i></Form.Label>
           <Form.Control
             disabled={!isRequiredFieldsSelected()}
             name='name'
             required
             type="text"
             onChange={onChange}
-            placeholder="Введите название подзадачи"/>
-            
+            placeholder="Введите название подзадачи" />
+
         </Form.Group>
       )
     return (
@@ -94,14 +94,13 @@ export const SubtaskManagerModal: React.FC<SubtaskManagerModalProps> = ({ show, 
           onChange={selectSubtaskForEdit}>
           <option>Выберите подзадачу</option>
           {parentTask?.subtasks && parentTask.subtasks.map((subTask) => {
-            if (subTask.taskId === parentTask.id)
+            if (subTask.taskId === parentTask.id && !subTask.checked)
               return <option key={subTask.id} value={subTask.id}>{subTask.name}</option>
           })}
         </Form.Select>
       </Form.Group>
     )
   }
-
 
   return (
     <Modal
@@ -121,12 +120,17 @@ export const SubtaskManagerModal: React.FC<SubtaskManagerModalProps> = ({ show, 
         <Modal.Body>
           <Form.Group className='mb-3' controlId="selectTask">
             <Form.Label>Критерии завершения адаптационного периода</Form.Label>
-            <Form.Select defaultValue={0} required aria-label="Выберите критерий"
+            <Form.Select 
+            defaultValue={0} 
+            required 
+            aria-label="Выберите критерий"
               onChange={selectParentTask}>
               <option value={0} >Выберите критерий</option>
-              {tasks.map((task) => (
-                <option key={task.id} value={task.id} >{task.name}</option>
-              ))}
+              {tasks.map((task) => {
+                if (isModeAdd && !task.checked && (!task.subtasks || task.subtasks && task.subtasks?.length < 20)
+                || !isModeAdd && !checkSubtasks(task.id))
+                  return (<option key={task.id} value={task.id} >{task.name}</option>)
+              })}
             </Form.Select>
           </Form.Group>
 
@@ -134,12 +138,26 @@ export const SubtaskManagerModal: React.FC<SubtaskManagerModalProps> = ({ show, 
 
           <Form.Group className="mb-3" controlId="subtaskDescr">
             <Form.Label>Описание</Form.Label>
-            <Form.Control disabled={!isRequiredFieldsSelected()} value={subTask.description} name='description' onChange={onChange} as="textarea" rows={3} placeholder="Опишите подзадачу" />
+            <Form.Control
+              disabled={!isRequiredFieldsSelected()}
+              value={subTask.description}
+              name='description'
+              onChange={onChange}
+              as="textarea"
+              rows={3}
+              placeholder="Опишите подзадачу" />
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="subtaskResult">
             <Form.Label>Результат</Form.Label>
-            <Form.Control disabled={!isRequiredFieldsSelected()} value={subTask.result} name='result' onChange={onChange} as="textarea" rows={3} placeholder="Что у вас получилось?" />
+            <Form.Control
+              disabled={!isRequiredFieldsSelected()}
+              value={subTask.result}
+              name='result'
+              onChange={onChange}
+              as="textarea"
+              rows={3}
+              placeholder="Что у вас получилось?" />
           </Form.Group>
 
         </Modal.Body>

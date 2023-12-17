@@ -7,7 +7,7 @@ interface SubTaskListProps {
 }
 
 export const SubTaskList: React.FC<SubTaskListProps> = ({ subTaskList }) => {
-  const { editSubTask } = useTodo();
+  const { markSubTask } = useTodo();
 
   const toolTip = (subtaskDescr: Omit<SubTask, 'id' | 'taskId' | 'checked'>) => (
   
@@ -39,8 +39,8 @@ export const SubTaskList: React.FC<SubTaskListProps> = ({ subTaskList }) => {
                     defaultChecked={subTask.checked}
                     type='checkbox'
                     id={subTask.id.toString()}
-
-                    onChange={() => editSubTask({ ...subTask, checked: !subTask.checked })}
+                    disabled={subTask.checked}
+                    onChange={() => markSubTask(subTask.id, subTask.taskId)}
                   ></Form.Check.Input>
                   <Form.Check.Label {...triggerHandler}>{subTask.name}</Form.Check.Label>
                 </Form.Check>

@@ -2,7 +2,7 @@ import React from 'react';
 import { TaskList } from './TaskList';
 import { TodoProvider } from '../../../utils/indext';
 import { BtnController } from './BtnController';
-import { TitlePageComponent } from '../../../components/TitlePageComponent';
+import { TitlePageComponent } from '../../../components/TitlePage/TitlePageComponent';
 
 export const ApprenticeTodoPage: React.FC = () => {
   return (

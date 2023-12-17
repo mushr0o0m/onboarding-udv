@@ -1,58 +1,75 @@
 import React from "react";
 import { useState } from "react";
+import Cookies from 'js-cookie';
 import { authenticateUser, getUserType, logoutUser } from "./AuthenticateUser";
-
-export interface AuthContextProps {
-    token: null | string;
-    signIn: (newUser: UserDate, redirect: (userType: string) => void) => void;
-    signOut: (token: string, redirect: () => void) => void;
-}
-
-export const AuthContext = React.createContext<AuthContextProps>({
-    token: null,
-    signIn: () => { },
-    signOut: () => { }
-});
+import { AuthContext } from "./AuthContext";
 
 interface AuthProviderProps {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }
 
-interface UserDate {
-    email: string,
-    password: string
-}
 export const AuthProvider: React.FC<AuthProviderProps> = (({ children }) => {
 
-    const [token, setToken] = useState<string | null>(null)
+  const [token, setToken] = useState<string | null>(null);
+  const [userType, setUserType] = useState<'WR' | 'HR' | null>(null);
 
-
-    const signIn = (newUser: UserDate, redirect: (userType: string) => void) => {
-        authenticateUser(newUser)
-            .then((currentToken) => {
-                setToken(currentToken);
-                console.log('Token', currentToken);
-                return currentToken;
-            })
-            .then((currentToken) => {
-                return getUserType(currentToken)
-            })
-            .then((userType) => (redirect(userType)));
+  React.useEffect(() => {
+    console.log('start')
+    const savedToken = Cookies.get('Token');
+    if (savedToken) {
+      setToken(savedToken);
     }
+  }, []);
 
-    const signOut = (token: string, redirect: () => void) => {
-        if (token)
-            logoutUser(token)
-                .then(() => setToken(null))
-                .then(() => (redirect()));
-    }
+  React.useEffect(() => {
+    const fetchUserType = (token: string): Promise<void> => {
+    return getUserType(token)
+      .then((userType) =>
+        {
+          console.log('fetchUserType', userType)
+          setUserType(userType === 'HR' ? 'HR' : 'WR')
+        });
+  }
+    if (token)
+      fetchUserType(token);
+  }, [token, setUserType]);
 
-    const value = {
-        signIn, signOut, token
-    }
+  
 
-    return (
-        <AuthContext.Provider value={value}>
-            {children}
-        </AuthContext.Provider>)
+  const signIn = (newUser: UserDate): Promise<void> => {
+    return authenticateUser(newUser)
+      .then((currentToken) => {
+        setToken(currentToken);
+        console.log('Token', currentToken);
+        Cookies.set('Token', currentToken, {
+          expires: 7,
+          secure: true,
+          sameSite: 'strict',
+        });
+      })
+      .catch((error) => {
+        console.error('Error during sign-in:', error);
+        throw error;
+      });
+  }
+
+  const signOut = (token: string): Promise<void> => {
+    if (token)
+      return logoutUser(token)
+        .then(() => {
+          setToken(null);
+          Cookies.remove('Token');
+          setUserType(null);
+        });
+    throw new Error('Token is missing');
+  }
+
+  const value = {
+    signIn, signOut, token, userType
+  }
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>)
 })

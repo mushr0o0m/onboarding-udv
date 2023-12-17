@@ -1,3 +1,6 @@
+$tooltip-max-width: none;
+$btn-close-color: #dc3545;
+
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 :root {
@@ -27,8 +30,26 @@
     --bs-btn-active-border-color: #{shade-color($purple, 20%)};
   }
 
-  $tooltip-max-width: none;
+  .btn-bd-primary:disabled, .btn-bd-primary.disabled {
+    --bs-btn-disabled-font-weight: 600;
+    --bs-btn-disabled-color: var(--bs-gray);
+    --bs-btn-disabled-bg: var(--bs-light);
+    --bs-btn-disabled-border-color: var(--bs-gray-600);
+    --bs-btn-disabled-border-radius: .5rem;
+  }
+
+  
+ 
 
   .tooltip-inner {
     max-width: none;
+  }
+
+  .custom-tooltip .tooltip-inner {
+    background-color: var(--bs-warning); /* Цвет фона */
+    color: var(--bs-black); /* Цвет текста */
+  }
+  
+  .custom-tooltip .tooltip-arrow::before {
+    border-bottom-color: var(--bs-warning); /* Цвет стрелки */
   }

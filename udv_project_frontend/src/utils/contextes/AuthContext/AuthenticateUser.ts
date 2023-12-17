@@ -32,7 +32,6 @@ export const getUserType = async (token: string | Promise<string>): Promise<stri
         });
 
         const userType = response.data.who;
-        console.log(userType)
         return userType;
 
     } catch (error) {

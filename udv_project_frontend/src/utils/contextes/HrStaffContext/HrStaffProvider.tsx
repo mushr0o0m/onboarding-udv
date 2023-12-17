@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react'
 import { HrStaffContext } from './HrStaffContext'
 import { getEmployeeById, getEmployeeList, postEmployee, deleteEmployee } from './api/WorkerRequests';
@@ -8,52 +7,12 @@ interface HrStaffProviderProps {
   children: React.ReactNode;
 }
 
-// const STAFF_LIST_EXAMPLE = [
-//   {
-//     id: 0,
-//     name: 'Kirill',
-//     surname: 'Filonik',
-//     patronymic: 'Русланович',
-//     employmentDate: new Date(2023, 10, 19),
-//     jobTitle: 'Front-end developer',
-//     email: 'kirill@email.com',
-//     telegramm: 'mushroom',
-//     tasks: [
-//       {
-//         id: 0,
-//         name: 'Написать оле',
-//         checked: true
-//       }
-//     ]
-//   },
-//   {
-//     id: 1,
-//     name: 'Girasim',
-//     surname: 'Filonik',
-//     patronymic: 'Русланович',
-//     employmentDate: new Date(2023, 10, 19),
-//     jobTitle: 'FullStack developer',
-//     email: 'geral@email.com',
-//     tasks: []
-//   },
-//   {
-//     id: 2,
-//     name: 'Girasim',
-//     surname: 'Filonik',
-//     patronymic: 'Русланович',
-//     employmentDate: new Date(2023, 10, 19),
-//     jobTitle: 'FullStack developer',
-//     email: 'geral@email.com',
-//     tasks: []
-//   }
-// ]
-
 export const HrStaffProvider: React.FC<HrStaffProviderProps> = (({ children }) => {
 
   const [staff, setStaff] = React.useState<Employee[]>([]);
   const [employee, setEmployee] = React.useState<Employee | null>(null);
   const [employeeId, setEmployeeId] = React.useState<Employee['id']>();
-  const { token } = useAuth();
+  const { token, userType } = useAuth();
 
   React.useEffect(() => {
     const fetchEmployeeList = async () => {
@@ -65,10 +24,10 @@ export const HrStaffProvider: React.FC<HrStaffProviderProps> = (({ children }) =
       }
     };
 
-    if (token) {
+    if (token && userType === 'HR') {
       fetchEmployeeList();
     }
-  }, [token]);
+  }, [token, userType]);
 
   React.useEffect(() => {
     const fetchEmployeeById = async (id: number) => {
@@ -81,10 +40,10 @@ export const HrStaffProvider: React.FC<HrStaffProviderProps> = (({ children }) =
       }
     };
 
-    if (token && employeeId) {
+    if (token && employeeId && userType === 'HR') {
       fetchEmployeeById(employeeId);
     }
-  }, [employeeId, token]);
+  }, [employeeId, token, userType]);
 
   const removeEmployee = (id: Employee['id']) => {
     deleteEmployee(id, token)
@@ -128,17 +87,14 @@ export const HrStaffProvider: React.FC<HrStaffProviderProps> = (({ children }) =
   };
 
 
-  const value = React.useMemo(
-    () => ({
+  const value = {
       staff,
       employee,
       setEmployeeId,
       removeEmployee,
       addEmployee,
       editEmployee,
-    }),
-    [staff, employee, setEmployeeId, removeEmployee, addEmployee, editEmployee]
-  );
+    }
 
   return (
     <HrStaffContext.Provider value={value}>

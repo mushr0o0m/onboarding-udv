@@ -1,8 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { TodoContext } from './TodoContext';
-import { deleteSubtask, getTaskList, patchTask, postSubtask, putSubtask } from './api/TodoRequests';
+import { deleteSubtask, getFirstDayTasks, getTaskList, patchFirstDayTask, patchSubtask, patchTask, postSubtask, putSubtask } from './api/TodoRequests';
 import { useAuth } from '../AuthContext/useAuth';
+import { AxiosError } from 'axios';
 
 interface TodoProviderProps {
   children: React.ReactNode;
@@ -10,29 +10,81 @@ interface TodoProviderProps {
 
 export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
   const [tasks, setTasks] = React.useState<Task[]>([]);
-  const { token } = useAuth();
+  const [firstDayTasks, setFirstDayTasks] = React.useState<Task[]>([])
+  const [isFirstDayFinish, setIsFirstDayFinish] = React.useState<boolean>(false);
+  const { token, userType } = useAuth();
 
   React.useEffect(() => {
     const fetchTaskList = async () => {
-      try {
-        const taskList = await getTaskList(token);
-        setTasks(taskList);
-        // const subtasks = taskList.map((task: Task) => task.subtasks).flat();
-      } catch (error) {
-        console.error('Error fetching task list:', error);
-      }
+      getTaskList(token)
+        .then((taskList) => setTasks(taskList))
+        .catch((error) => console.error('Error fetching task list:', error));
     };
 
-    if (token) {
+    if (token && userType === 'WR') {
       fetchTaskList();
     }
-  }, [token]);
+  }, [token, userType]);
+
+  React.useEffect(() => {
+    const fetchFDTaskList = async () => {
+      getFirstDayTasks(token)
+        .then((taskList) => setFirstDayTasks(taskList))
+        .then(() => (setIsFirstDayFinish(false)))
+        .catch((error: AxiosError) => {
+          if (error.response?.status === 400) {
+            setIsFirstDayFinish(true);
+          }
+          else
+            console.error('Error fetching first day tasks:', error)
+        })
+    };
+
+    if (token && userType === 'WR') {
+      fetchFDTaskList();
+    }
+  }, [token, userType]);
+
+  React.useEffect(() => {
+    const checkIsFirstDayFinished = (() => {
+      let result = true;
+      firstDayTasks.map((task) => {
+        if (!task.checked) {
+          result = false;
+          return
+        }
+      });
+      console.log('checkIsFirstDayFinished', result, firstDayTasks)
+      setIsFirstDayFinish(result);
+    });
+
+    if(token && userType === 'WR' && firstDayTasks)
+    checkIsFirstDayFinished()
+  }, [token, userType, firstDayTasks]);
+
+
+  const checkSubtasks = (taskId: Task['id']): boolean => {
+    let isSubtasksChecked = true;
+    if (tasks)
+      tasks.map((task) => {
+        if (task.id === taskId)
+          task.subtasks?.map((subtask) => {
+            if (!subtask.checked) {
+              isSubtasksChecked = false;
+              return
+            }
+          })
+      });
+      return isSubtasksChecked;
+  }
+
+  
 
   const addSubTaskToTask = ({ name, description, result, taskId }: Omit<SubTask, 'checked' | 'id'>) => {
     const newSubTask = {
       description, name, checked: false, taskId, result
     };
-    
+
     postSubtask(newSubTask, token)
       .then((subtask: SubTask) =>
         setTasks(prevTask =>
@@ -43,27 +95,40 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
           })));
   };
 
-  // const markSubTask = (id: SubTask['id']) => {
-  //   const newSubTask = subTasks.map((subTask) => {
-  //     if (subTask.id === id)
-  //       return { ...subTask, checked: !subTask.checked }
-  //   }).filter(Boolean)[0];
-
-  //   if (newSubTask)
-  //     putSubtask(newSubTask, token).then(() => (
-  //       setSubTasks((prevTodos) =>
-  //         prevTodos.map((subTask) => (subTask.id === id ? newSubTask : subTask))
-  //       )
-  //     ));
-
-  // };
+  const markSubTask = (id: SubTask['id'], taskId: SubTask['taskId']) => {
+    patchSubtask(id, true, token).then(() => {
+      setTasks(prevTask =>
+        prevTask.map(task => {
+          if (task.id === taskId)
+            return {
+              ...task,
+              subtasks:
+                (task.subtasks || []).map((subTask) =>
+                  subTask.id === id ? { ...subTask, checked: true } : subTask),
+              checked: task.subtasks && task.subtasks.length >= 19 ? true : task.checked
+            }
+          return task
+        }));
+    });
+  };
 
   const markTask = (taskId: Task['id'], taskChecked: Task['checked']) => {
     patchTask(taskId, taskChecked, token)
-      .then(() => 
+      .then(() =>
         setTasks(prevTasks => prevTasks.map(task => {
           if (task.id === taskId)
             return { ...task, checked: taskChecked };
+          return task;
+        }))
+      )
+  };
+
+  const markFirstDayTask = (taskId: Task['id']) => {
+    patchFirstDayTask(taskId, token)
+      .then(() =>
+        setFirstDayTasks(prevTasks => prevTasks.map(task => {
+          if (task.id === taskId)
+            return { ...task, checked: true };
           return task;
         }))
       )
@@ -94,17 +159,18 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
     });
   };
 
-  const value = React.useMemo(
-    () => ({
-      tasks,
-      addSubTaskToTask,
-      deleteSubTask,
-      // markSubTask,
-      markTask,
-      editSubTask,
-    }),
-    [tasks, addSubTaskToTask, deleteSubTask, editSubTask, markTask,]
-  );
+  const value = {
+    tasks,
+    addSubTaskToTask,
+    deleteSubTask,
+    markSubTask,
+    markTask,
+    editSubTask,
+    checkSubtasks,
+    firstDayTasks,
+    markFirstDayTask,
+    isFirstDayFinish,
+  };
 
   return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;
 };

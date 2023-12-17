@@ -1,3 +1,8 @@
+type UserDate = {
+  email: string,
+  password: string
+}
+
 type Task = {
   id: number;
   name: string;
@@ -22,8 +27,26 @@ type Employee = {
   employmentDate: Date;
   jobTitle: string;
   email: string;
-  telegramm?: string;
+  telegram?: string;
   tasks: Task[];
+}
+
+type Project = {
+  id: number,
+  name: string,
+  description: string,
+  deskLink: string,
+  contacts: Contact[]
+}
+
+type Contact = {
+  id: number,
+  name: string,
+  surname: string,
+  patronymic?: string,
+  email: string,
+  telegram?: string,
+  jobTitle: string
 }
 
 //Response
@@ -57,5 +80,14 @@ type ResponseSubtask = {
   result: string,
   description: string,
   is_completed: boolean
+}
+
+//interface
+
+interface TextInputDate{
+  handleChangeForm: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  value: string | number;
+  readonly?: boolean;
+  inputColSize?: number;
 }
 
