@@ -16,3 +16,13 @@ FIRST_DAY_TASKS = ['Подписать документы на трудоуст�
 SUBTASKS_MAX_COUNT = 20
 
 FIRST_DAY_TASKS_LEN = len(FIRST_DAY_TASKS)
+
+COUNT_ITEMS = 4
+
+REWARD = 3
+
+ITEM_COST = 100
+
+MAIN_TASKS_STARS = 300
+
+FIRST_DAY_TASKS_STARS = 100

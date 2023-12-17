@@ -6,7 +6,7 @@ class SubtaskSerializer(serializers.Serializer):
     task_id = serializers.SlugRelatedField(queryset=Task.objects.all(), slug_field='id')
     name = serializers.CharField()
     description = serializers.CharField(allow_blank=True, required=False)
-    result = serializers.CharField()
+    result = serializers.CharField(required=False, allow_blank=True)
     is_completed = serializers.BooleanField()
 
     def create(self, validated_data):
@@ -40,12 +40,12 @@ class TasksListSerializer(serializers.Serializer):
 
 class WorkersSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    name = serializers.CharField()
-    surname = serializers.CharField()
-    patronymic = serializers.CharField()
+    name = serializers.CharField(required=False, allow_blank=True)
+    surname = serializers.CharField(required=False, allow_blank=True)
+    patronymic = serializers.CharField(required=False, allow_blank=True)
     telegram = serializers.CharField()
     hr_id = serializers.IntegerField()
-    jobTitle = serializers.CharField()
+    jobTitle = serializers.CharField(required=False, allow_blank=True)
     employmentDate = serializers.DateField()
     email = serializers.CharField()
     user_id = serializers.IntegerField()
@@ -54,11 +54,11 @@ class WorkersSerializer(serializers.Serializer):
 
 
 class WorkerPutSerializer(serializers.Serializer):
-    name = serializers.CharField()
-    surname = serializers.CharField()
-    patronymic = serializers.CharField()
+    name = serializers.CharField(required=False, allow_blank=True)
+    surname = serializers.CharField(required=False, allow_blank=True)
+    patronymic = serializers.CharField(required=False, allow_blank=True)
     telegram = serializers.CharField()
-    jobTitle = serializers.CharField()
+    jobTitle = serializers.CharField(required=False, allow_blank=True)
     employmentDate = serializers.DateField()
     hr_id = serializers.SlugRelatedField(queryset=Hr.objects.all(), slug_field='id')
 
@@ -105,32 +105,32 @@ class UserSerializer(serializers.Serializer):
 
 class ContactReadSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    name = serializers.CharField()
-    surname = serializers.CharField()
-    patronymic = serializers.CharField()
+    name = serializers.CharField(required=False, allow_blank=True)
+    surname = serializers.CharField(required=False, allow_blank=True)
+    patronymic = serializers.CharField(required=False, allow_blank=True)
     email = serializers.CharField()
     telegram = serializers.CharField()
-    jobTitle = serializers.CharField()
+    jobTitle = serializers.CharField(required=False, allow_blank=True)
 
 
 class ContactSerializer(serializers.Serializer):
-    name = serializers.CharField()
-    surname = serializers.CharField()
-    patronymic = serializers.CharField()
+    name = serializers.CharField(required=False, allow_blank=True)
+    surname = serializers.CharField(required=False, allow_blank=True)
+    patronymic = serializers.CharField(required=False, allow_blank=True)
     email = serializers.CharField()
     telegram = serializers.CharField()
-    jobTitle = serializers.CharField()
+    jobTitle = serializers.CharField(required=False, allow_blank=True)
 
     def create(self, validated_data):
         return Contact.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.email = validated_data["email"]
-        instance.name = validated_data["name"]
-        instance.surname = validated_data["surname"]
-        instance.patronymic = validated_data["patronymic"]
-        instance.telegram = validated_data["telegram"]
-        instance.jobTitle = validated_data["jobTitle"]
+        instance.email = validated_data.get("email", instance.email)
+        instance.name = validated_data.get("name", instance.name)
+        instance.surname = validated_data.get("surname", instance.surname)
+        instance.patronymic = validated_data.get("patronymic", instance.patronymic)
+        instance.telegram = validated_data.get("telegram", instance.telegram)
+        instance.jobTitle = validated_data.get("jobTitle", instance.jobTitle)
         instance.save()
         return instance
 
@@ -138,23 +138,23 @@ class ContactSerializer(serializers.Serializer):
 class ProjectReadSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
-    description = serializers.CharField()
-    deskLink = serializers.CharField()
+    description = serializers.CharField(required=False, allow_blank=True)
+    deskLink = serializers.CharField(required=False, allow_blank=True)
     contacts = ContactReadSerializer(read_only=True, many=True)
 
 
 class ProjectSerializer(serializers.Serializer):
     name = serializers.CharField()
-    description = serializers.CharField()
-    deskLink = serializers.CharField()
+    description = serializers.CharField(required=False, allow_blank=True)
+    deskLink = serializers.CharField(required=False, allow_blank=True)
 
     def create(self, validated_data):
         return Project.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.name = validated_data["name"]
-        instance.description = validated_data["description"]
-        instance.deskLink = validated_data["deskLink"]
+        instance.name = validated_data.get("name", instance.name)
+        instance.description = validated_data.get("description", instance.description)
+        instance.deskLink = validated_data.get("deskLink", instance.deskLink)
         instance.save()
         return instance
 
