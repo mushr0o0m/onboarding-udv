@@ -115,7 +115,8 @@ class TasksListView(APIView):
                 task = Task.objects.get(id=instance.task_id)
                 task.is_completed = True
                 task.save()
-            worker.stars += decimal.Decimal((MAIN_TASKS_STARS / len(Task.objects.filter(worker_id=worker.id))) / SUBTASKS_MAX_COUNT)
+            worker.stars += decimal.Decimal(
+                (MAIN_TASKS_STARS / len(Task.objects.filter(worker_id=worker.id))) / SUBTASKS_MAX_COUNT)
             worker.save()
         return Response({'post': SubtaskReadSerializer(instance).data})
 
@@ -169,7 +170,7 @@ class WorkerListView(APIView):
                                                    'user_id': user.id,
                                                    'tasks': tasks_list
                                                    }).data)
-
+        workers_list.reverse()
         return Response({'workers': workers_list})
 
 
@@ -187,22 +188,22 @@ class WorkerView(APIView):
         except:
             return HttpResponseBadRequest("We cannot process the request. Not such hr")
 
-        '''pwo = PasswordGenerator()
+        pwo = PasswordGenerator()
         pwo.minlen = 8
         pwo.maxlen = 8
         pwo.minuchars = 2
         pwo.minlchars = 4
         pwo.minnumbers = 1
         pwo.minschars = 1
-        password = pwo.generate()'''
+        password = pwo.generate()
         password = 'AB133777'
         user = User.objects.create_user(email=data['email'], password=password)
 
-        '''send_mail('Регистрация на сервисе для онбординга UDV',
+        send_mail('Регистрация на сервисе для онбординга UDV',
                   'Похоже вы недавно устроились на работу в UDV, поздравляем! Ваш Hr, ' + str(hr.name) +
                   ' уже вас зарегистрировал(а). Переходите скорее в сервис \nВаш пароль: ' + str(password) + '.',
                   settings.EMAIL_HOST_USER,
-                  [data['email']])'''
+                  [data['email']])
 
         worker = Worker.objects.get(user_id=user.id)
 
@@ -413,8 +414,6 @@ class TaskView(APIView):
             if worker.is_first_day:
                 instance.is_completed = is_completed_row
                 instance.save()
-                worker.stars += decimal.Decimal(FIRST_DAY_TASKS_STARS/FIRST_DAY_TASKS_LEN)
-                worker.save()
                 tasks = Task.objects.filter(worker_id=worker.id)[:FIRST_DAY_TASKS_LEN]
                 is_all_completed = True
                 for task in tasks:
@@ -434,8 +433,8 @@ class TaskView(APIView):
                 if is_subtasks_completed:
                     instance.is_completed = is_completed_row
                     instance.save()
-                    worker.stars += decimal.Decimal((SUBTASKS_MAX_COUNT - len(subtasks))*(
-                            (MAIN_TASKS_STARS/len(Task.objects.filter(worker_id=worker.id)))/SUBTASKS_MAX_COUNT))
+                    worker.stars += decimal.Decimal((SUBTASKS_MAX_COUNT - len(subtasks)) * (
+                            (MAIN_TASKS_STARS / len(Task.objects.filter(worker_id=worker.id))) / SUBTASKS_MAX_COUNT))
                     worker.save()
                 else:
                     return HttpResponseBadRequest("We cannot process the request. Cannot cansel completed task with "
@@ -597,6 +596,8 @@ class FirstDayView(APIView):
         if worker.is_first_day:
             instance.is_completed = True
             instance.save()
+            worker.stars += decimal.Decimal(FIRST_DAY_TASKS_STARS / FIRST_DAY_TASKS_LEN)
+            worker.save()
             tasks = Task.objects.filter(worker_id=worker.id)[:FIRST_DAY_TASKS_LEN]
             is_all_completed = True
             for task in tasks:
@@ -628,6 +629,7 @@ class GameView(APIView):
             worker = Worker.objects.get(user_id=request.user.id)
         except:
             raise Http404
+        path = '\src\images\\'
         return Response({'ordinaryBack': int(not worker.is_back),
                          'ordinaryTable': int(not worker.is_table),
                          'ordinaryComputer': int(not worker.is_computer),
@@ -636,14 +638,14 @@ class GameView(APIView):
                          'cosmosTable': int(worker.is_table),
                          'cosmosComputer': int(worker.is_computer),
                          'cosmosChair': int(worker.is_chair),
-                         'buttonBack': 'disabled' if worker.is_back else '',
-                         'buttonTable': 'disabled' if worker.is_table else '',
-                         'buttonComputer': 'disabled' if worker.is_computer else '',
-                         'buttonChair': 'disabled' if worker.is_chair else '',
-                         'progress': worker.u_coins/(REWARD*COUNT_ITEMS),
+                         'buttonBack': worker.is_back,
+                         'buttonTable': worker.is_table,
+                         'buttonComputer': worker.is_computer,
+                         'buttonChair': worker.is_chair,
+                         'progress': worker.u_coins / (REWARD * COUNT_ITEMS),
+                         'imagePath': path + str(worker.u_coins / (REWARD * COUNT_ITEMS)) + ".png",
                          'max': 1.0,
-                         'count_stars': int(worker.stars),
-                         'count_ucoins': int(worker.u_coins)
+                         'count_stars': int(worker.stars)
                          })
 
     def put(self, request, *args, **kwargs):
@@ -677,14 +679,30 @@ class GameView(APIView):
                          'cosmosTable': int(worker.is_table),
                          'cosmosComputer': int(worker.is_computer),
                          'cosmosChair': int(worker.is_chair),
-                         'buttonBack': 'disabled' if worker.is_back else '',
-                         'buttonTable': 'disabled' if worker.is_table else '',
-                         'buttonComputer': 'disabled' if worker.is_computer else '',
-                         'buttonChair': 'disabled' if worker.is_chair else '',
-                         'progress': worker.u_coins/(REWARD * COUNT_ITEMS),
+                         'buttonBack': worker.is_back,
+                         'buttonTable': worker.is_table,
+                         'buttonComputer': worker.is_computer,
+                         'buttonChair': worker.is_chair,
+                         'progress': worker.u_coins / (REWARD * COUNT_ITEMS),
+                         'imagePath': "\src\images\\" + str(worker.u_coins / (REWARD * COUNT_ITEMS)) + ".png",
                          'max': 1.0,
-                         'count_stars': int(worker.stars),
-                         'count_ucoins': int(worker.u_coins)
+                         'count_stars': int(worker.stars)
                          })
 
 
+class IsOnboardingOver(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            worker = Worker.objects.get(user_id=request.user.id)
+        except:
+            raise Http404
+        tasks = Task.objects.filter(worker_id=worker.id)
+        is_all_completed = True
+        for task in tasks:
+            if not task.is_completed:
+                is_all_completed = False
+        return Response({"post": is_all_completed and
+                                 worker.is_back and
+                                 worker.is_table and
+                                 worker.is_computer and
+                                 worker.is_chair})

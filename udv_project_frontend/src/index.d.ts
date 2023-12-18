@@ -82,9 +82,28 @@ type ResponseSubtask = {
   is_completed: boolean
 }
 
+type GameObject = {
+  ordinaryBack: number,
+  ordinaryTable: number,
+  ordinaryComputer: number,
+  ordinaryChair: number,
+  cosmosBack: number,
+  cosmosTable: number,
+  cosmosComputer: number,
+  cosmosChair: number,
+  buttonBack: boolean,
+  buttonTable: boolean,
+  buttonComputer: boolean,
+  buttonChair: boolean,
+  progress: number,
+  max: number,
+  imagePath: string,
+  count_stars: number,
+}
+
 //interface
 
-interface TextInputDate{
+interface TextInputDate {
   handleChangeForm: (event: React.ChangeEvent<HTMLInputElement>) => void;
   value: string | number;
   readonly?: boolean;

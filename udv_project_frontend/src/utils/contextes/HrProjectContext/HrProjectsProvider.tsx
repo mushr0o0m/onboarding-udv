@@ -33,7 +33,7 @@ export const HrProjectsProvider: React.FC<HrProjectsProviderProps> = (({ childre
       }
     };
 
-    if (token && userType === 'HR') {
+    if (token) {
       fetchProjectList();
       fetchContactList();
     }
@@ -49,7 +49,7 @@ export const HrProjectsProvider: React.FC<HrProjectsProviderProps> = (({ childre
       }
     };
 
-    if (token && userType === 'HR' && idForGetProject) {
+    if (token && idForGetProject) {
       fetchProjectById();
     }
   }, [token, userType, idForGetProject]);

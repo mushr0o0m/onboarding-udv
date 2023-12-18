@@ -17,9 +17,10 @@ export const getTaskList = async (token: string | null): Promise<Task[]> => {
     throw error;
   }
 };
-
+//проверь какой тип ошибки передаётся
 export const getFirstDayTasks = async (token: string | null): Promise<Task[]> => {
   try {
+
     const response = await axios.get(`${apiUrl}/api/first_day/`, {
       headers: {
         Authorization: `Token ${token}`,
@@ -28,8 +29,10 @@ export const getFirstDayTasks = async (token: string | null): Promise<Task[]> =>
     return response.data.tasks.map((task: ResponseTask) => mapResponseTasksToTasks(task));
 
   } catch (error) {
+    console.log(typeof error)
     if((error as AxiosError)?.response?.status != 400)
-      console.error('Get First Day Tasks Error:', (error as AxiosError)?.response || (error as Error).message);
+      {
+        console.error('Get First Day Tasks Error:', (error as AxiosError)?.response || (error as Error).message)};
     throw error;
   }
 };
