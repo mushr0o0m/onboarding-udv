@@ -720,7 +720,7 @@ class GameView(APIView):
                          })
 
 
-class IsOnboardingOver(APIView):
+class IsOnboardingOverView(APIView):
     def get(self, request, *args, **kwargs):
         try:
             worker = Worker.objects.get(user_id=request.user.id)
@@ -748,3 +748,12 @@ class IsOnboardingOver(APIView):
         worker.is_over = True
         worker.save()
         return Response({"post": worker.is_over})
+
+
+class StarsView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            worker = Worker.objects.get(user_id=request.user.id)
+        except:
+            raise Http404
+        return Response({"post": int(worker.stars)})
