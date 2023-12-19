@@ -27,8 +27,7 @@ class CustomValidation(APIException):
         if detail is not None:
             self.detail = {field: force_str(detail),
                            'errors': {
-                               'email': 'Email уже не существует',
-                               'username': 'Имя пользователя уже существует'
+                               'email': 'Email уже существует'
                            }}
         else:
             self.detail = {'detail': force_str(self.default_detail)}
