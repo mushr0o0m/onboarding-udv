@@ -108,6 +108,7 @@ class Worker(models.Model):
     is_chair = models.BooleanField(default=False)
     stars = models.DecimalField(default=0.0, max_digits=5, decimal_places=2)
     u_coins = models.DecimalField(default=0.0, max_digits=5, decimal_places=2)
+    is_over = models.BooleanField(default=False)
 
     def __int__(self):
         return self.id

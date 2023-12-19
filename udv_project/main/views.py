@@ -196,8 +196,11 @@ class WorkerView(APIView):
         pwo.minnumbers = 1
         pwo.minschars = 1
         password = pwo.generate()
-        password = 'AB133777'
-        user = User.objects.create_user(email=data['email'], password=password)
+        password = 'aB13n%i7'
+        try:
+            user = User.objects.create_user(email=data['email'], password=password)
+        except:
+            return HttpResponseBadRequest('user with this email is already exists')
 
         send_mail('Регистрация на сервисе для онбординга UDV',
                   'Похоже вы недавно устроились на работу в UDV, поздравляем! Ваш Hr, ' + str(hr.name) +
@@ -214,6 +217,7 @@ class WorkerView(APIView):
         worker.jobTitle = data['jobTitle']
         worker.employmentDate = data['employmentDate'][:10].replace('.', '-')
         worker.is_first_day = True
+        worker.is_over = False
         worker.hr_id = hr
         worker.save()
 
@@ -629,7 +633,6 @@ class GameView(APIView):
             worker = Worker.objects.get(user_id=request.user.id)
         except:
             raise Http404
-        path = '\src\images\\'
         return Response({'ordinaryBack': int(not worker.is_back),
                          'ordinaryTable': int(not worker.is_table),
                          'ordinaryComputer': int(not worker.is_computer),
@@ -643,7 +646,11 @@ class GameView(APIView):
                          'buttonComputer': worker.is_computer,
                          'buttonChair': worker.is_chair,
                          'progress': worker.u_coins / (REWARD * COUNT_ITEMS),
-                         'imagePath': path + str(worker.u_coins / (REWARD * COUNT_ITEMS)) + ".png",
+                         'imagePath': [worker.u_coins == 0,
+                                       worker.u_coins == 3,
+                                       worker.u_coins == 6,
+                                       worker.u_coins == 9,
+                                       worker.u_coins == 12],
                          'max': 1.0,
                          'count_stars': int(worker.stars)
                          })
@@ -684,7 +691,11 @@ class GameView(APIView):
                          'buttonComputer': worker.is_computer,
                          'buttonChair': worker.is_chair,
                          'progress': worker.u_coins / (REWARD * COUNT_ITEMS),
-                         'imagePath': "\src\images\\" + str(worker.u_coins / (REWARD * COUNT_ITEMS)) + ".png",
+                         'imagePath': [worker.u_coins == 0,
+                                       worker.u_coins == 3,
+                                       worker.u_coins == 6,
+                                       worker.u_coins == 9,
+                                       worker.u_coins == 12],
                          'max': 1.0,
                          'count_stars': int(worker.stars)
                          })
@@ -696,13 +707,25 @@ class IsOnboardingOver(APIView):
             worker = Worker.objects.get(user_id=request.user.id)
         except:
             raise Http404
-        tasks = Task.objects.filter(worker_id=worker.id)
-        is_all_completed = True
-        for task in tasks:
-            if not task.is_completed:
-                is_all_completed = False
-        return Response({"post": is_all_completed and
-                                 worker.is_back and
-                                 worker.is_table and
-                                 worker.is_computer and
-                                 worker.is_chair})
+        if worker.is_over:
+            return Response({"post": False})
+        else:
+            tasks = Task.objects.filter(worker_id=worker.id)
+            is_all_completed = True
+            for task in tasks:
+                if not task.is_completed:
+                    is_all_completed = False
+            return Response({"post": is_all_completed and
+                                     worker.is_back and
+                                     worker.is_table and
+                                     worker.is_computer and
+                                     worker.is_chair})
+
+    def put(self, request, *args, **kwargs):
+        try:
+            worker = Worker.objects.get(user_id=request.user.id)
+        except:
+            raise Http404
+        worker.is_over = True
+        worker.save()
+        return Response({"post": worker.is_over})
