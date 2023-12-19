@@ -125,7 +125,7 @@ class ContactSerializer(serializers.Serializer):
         return Contact.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.email = validated_data.get("email", instance.email)
+        instance.email = validated_data["email"]
         instance.name = validated_data.get("name", instance.name)
         instance.surname = validated_data.get("surname", instance.surname)
         instance.patronymic = validated_data.get("patronymic", instance.patronymic)
