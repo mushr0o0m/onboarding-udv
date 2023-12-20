@@ -3,6 +3,12 @@ type UserDate = {
   password: string
 }
 
+type UserFullName = {
+  name: string,
+  surname: string,
+  patronymic: string
+}
+
 type Task = {
   id: number;
   name: string;

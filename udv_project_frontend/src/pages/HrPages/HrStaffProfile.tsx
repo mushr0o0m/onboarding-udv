@@ -31,9 +31,9 @@ export const HrStaffProfile: React.FC = () => {
       <TitlePageComponent titleName='Профиль сотрудника' />
       <section className="container py-5">
         <div className="d-flex justify-content-between mb-3">
-          <div>
-            <h2 className=''>{employee.name} {employee.surname} {employee.patronymic}</h2>
-            <h5 className='d-inline text-secondary'>{employee.jobTitle}</h5>
+          <div className='w-75'>
+            <h2>{employee.surname} {employee.name} {employee.patronymic}</h2>
+            <p className='d-inline-block text-secondary text-wrap'>{employee.jobTitle}</p>
           </div>
           <div className='text-end  text-secondary'>
             <p className='mb-2'>Дата устройства:</p> {getFormatedDate(employee.employmentDate, 'dd-MM-yyyy')}

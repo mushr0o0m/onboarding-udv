@@ -23,6 +23,7 @@ export const AdaptationCriteriaForm: React.FC<AdaptationCriteriaFormProps> = ({h
         aria-label="Поле для ввода критериев АП"
         onChange={handleСriterionChange}
         value={criterion}
+        maxLength={70}
       />
       <Button variant="outline-secondary" id="add-btn-criterion" onClick={() => {
         if(criterion){

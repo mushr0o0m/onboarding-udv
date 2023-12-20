@@ -17,10 +17,18 @@ export const ApprenticeMainPage: React.FC = () => {
 
   const [showModal, setShowModal] = React.useState(false);
   const [showConfetti, setShowConfetti] = React.useState(false);
-
   const { tasks } = useTodo();
   const { game } = useGame();
-  const { token } = useAuth();
+  const { token, userName } = useAuth();
+
+  React.useEffect(() => {
+    getOnboardingOverStatus(token)
+      .then((status) => {
+        setShowModal(status === true);
+        setShowConfetti(status === true);
+      });
+
+  }, [game, tasks, token])
 
   React.useEffect(() => {
     getOnboardingOverStatus(token)
@@ -33,7 +41,7 @@ export const ApprenticeMainPage: React.FC = () => {
 
   return (
     <>
-      <NavbarComponent navs={navs} homeUrl='/apprentice' userName={null} />
+      <NavbarComponent navs={navs} homeUrl='/apprentice' userName={userName} />
       <Outlet />
       <OnboardingFinishModal
         showModal={showModal}

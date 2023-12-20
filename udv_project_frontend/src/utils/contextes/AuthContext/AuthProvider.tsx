@@ -3,6 +3,7 @@ import { useState } from "react";
 import Cookies from 'js-cookie';
 import { authenticateUser, getUserType, logoutUser } from "./AuthenticateUser";
 import { AuthContext } from "./AuthContext";
+import { getUserName } from "../../api/getUserName";
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -12,9 +13,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = (({ children }) => {
 
   const [token, setToken] = useState<string | null>(null);
   const [userType, setUserType] = useState<'WR' | 'HR' | null>(null);
+  const [userName, setUserName] = useState<UserFullName | null>(null);
 
   React.useEffect(() => {
-    console.log('start')
     const savedToken = Cookies.get('Token');
     if (savedToken) {
       setToken(savedToken);
@@ -22,19 +23,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = (({ children }) => {
   }, []);
 
   React.useEffect(() => {
+    const fecthUserName = () => {
+      getUserName(token)
+        .then((fullUserName) => setUserName(fullUserName))
+    }
+    if (token) {
+      fecthUserName();
+    }
+  }, [token]);
+
+  React.useEffect(() => {
     const fetchUserType = (token: string): Promise<void> => {
-    return getUserType(token)
-      .then((userType) =>
-        {
-          console.log('fetchUserType', userType)
+      return getUserType(token)
+        .then((userType) => {
           setUserType(userType === 'HR' ? 'HR' : 'WR')
         });
-  }
+    }
     if (token)
       fetchUserType(token);
   }, [token, setUserType]);
 
-  
+
 
   const signIn = (newUser: UserDate): Promise<void> => {
     return authenticateUser(newUser)
@@ -65,7 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = (({ children }) => {
   }
 
   const value = {
-    signIn, signOut, token, userType
+    signIn, signOut, token, userType, userName
   }
 
   return (

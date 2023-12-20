@@ -9,7 +9,7 @@ import { StarNavbarIcon } from './components/StarNavbarIcon';
 interface NavbarComponentProps {
   homeUrl: string;
   navs: { title: string, url: string }[];
-  userName: string | null;
+  userName: UserFullName | null;
 }
 
 export const NavbarComponent: React.FC<NavbarComponentProps> = ({ homeUrl, navs, userName }) => {
@@ -56,7 +56,10 @@ export const NavbarComponent: React.FC<NavbarComponentProps> = ({ homeUrl, navs,
                   height={44}
                   src="../../src/assets/user_avatar.svg" />}
               >
-                <NavDropdown.Header>{userName ? userName : 'Уважаемый пользователь'}</NavDropdown.Header>
+                <NavDropdown.Header>
+                  {userName && userName.name != '' && userName.surname != '' ?
+                   `${userName.surname} ${userName.name}` : 'Уважаемый пользователь'}
+                </NavDropdown.Header>
                 <NavDropdown.Item as="button" onClick={logout}>Выйти</NavDropdown.Item>
               </NavDropdown>
             </div>
