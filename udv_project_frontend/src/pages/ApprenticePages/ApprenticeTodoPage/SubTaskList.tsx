@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useTodo } from '../../../utils/indext';
+import { useGame } from '../../../utils/contextes/GameContext/useGame';
 
 interface SubTaskListProps {
   subTaskList?: SubTask[];
@@ -8,7 +9,7 @@ interface SubTaskListProps {
 
 export const SubTaskList: React.FC<SubTaskListProps> = ({ subTaskList }) => {
   const { markSubTask } = useTodo();
-
+  const {fetchGameObject} = useGame();
   const toolTip = (subtaskDescr: Omit<SubTask, 'id' | 'taskId' | 'checked'>) => (
   
       <Tooltip id="subtask-prompt" style={{position:"fixed"}}>
@@ -40,7 +41,7 @@ export const SubTaskList: React.FC<SubTaskListProps> = ({ subTaskList }) => {
                     type='checkbox'
                     id={subTask.id.toString()}
                     disabled={subTask.checked}
-                    onChange={() => markSubTask(subTask.id, subTask.taskId)}
+                    onChange={() => {markSubTask(subTask.id, subTask.taskId), fetchGameObject()}}
                   ></Form.Check.Input>
                   <Form.Check.Label {...triggerHandler}>{subTask.name}</Form.Check.Label>
                 </Form.Check>

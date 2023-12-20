@@ -60,7 +60,7 @@ export const postEmployee = async (employee: Omit<Employee, 'id' | 'tasks'>, tas
 export const putEmployee = async (employee: Omit<Employee, 'tasks'>, token: string | null): Promise<Employee> => {
   try {
     const response = await axios.put(`${apiUrl}/api/worker/${employee.id}/`,
-    mapEmployeeToResponseEmployeeWithouTasks(employee),
+    {...mapEmployeeToResponseEmployeeWithouTasks(employee), tasks: undefined},
      {
       headers: {
         Authorization: `Token ${token}`,

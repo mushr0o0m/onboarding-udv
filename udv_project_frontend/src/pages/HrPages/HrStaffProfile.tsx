@@ -70,7 +70,7 @@ export const HrStaffProfile: React.FC = () => {
         <div className="d-flex justify-content-between">
           <Button className='btn-lg' onClick={() => setModalShow(true)} variant='danger'>Завершить адаптационный период</Button>
           <div>
-            <Button className='btn-lg me-3' onClick={() => (navigate(`/hr`))} variant='secondary'>Вернуться</Button>
+            <Button className='btn-lg me-3' onClick={() => (navigate(-1), setEmployeeId(undefined))} variant='secondary'>Вернуться</Button>
             <Button className='btn-lg' onClick={() => (navigate(`/hr/staff/${id}/edit`))} variant='bd-primary'>Редактировать</Button>
           </div>
 

@@ -43,6 +43,8 @@ export const HrStaffProvider: React.FC<HrStaffProviderProps> = (({ children }) =
     if (token && employeeId && userType === 'HR') {
       fetchEmployeeById(employeeId);
     }
+
+    console.log(token && employeeId && userType === 'HR')
   }, [employeeId, token, userType]);
 
   const removeEmployee = (id: Employee['id']) => {

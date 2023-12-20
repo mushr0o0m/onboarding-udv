@@ -22,9 +22,9 @@ export const BuyBtnGroup: React.FC<BuyBtnGroupProps> = ({ game, buyElementById }
       event.preventDefault();
   })
 
-  const toolTip = (isBought: boolean) => (
+  const toolTip = (isBought: boolean, countStars: number) => (
     <Tooltip id="subtask-prompt" className='tooltip' style={{ position: "fixed" }}>
-      {isBought ? <p>Вы уже купили данный предмет!</p>:
+      {isBought && countStars > 100 ? <p>Вы уже купили данный предмет!</p>:
        <p>К сожалению у вас не хватает звездочек, вперед выполнять критерии!</p>}
     </Tooltip>
   )
@@ -36,7 +36,7 @@ export const BuyBtnGroup: React.FC<BuyBtnGroupProps> = ({ game, buyElementById }
           className={`border ${game[btn.btnType] === true ? 'border-primary-subtle' : 'border-primary'}`}>
           <OverlayTrigger
             placement="auto"
-            overlay={toolTip(game[btn.btnType] === true)}
+            overlay={toolTip(game[btn.btnType] === true, game.count_stars)}
             delay={{ show: 200, hide: 200 }}
             show={game.count_stars < 100 ? undefined : false}
           >
