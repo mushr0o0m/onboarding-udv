@@ -7,9 +7,7 @@ export interface HrStaffContextProps {
     removeEmployee: (id: Employee['id']) => void;
     addEmployee: (employee: Omit<Employee, 'id' | 'tasks'>, tasks: Omit<Task, 'id'>[]) => void;
     editEmployee: (
-        id: Employee['id'],
-        updatedEmployee: Omit<Employee, 'id' | 'tasks'>,
-        updatedTaskList: Omit<Task, 'id'>[]
+        employee: Omit<Employee, 'tasks'>
       ) => void;
 }
 

@@ -70,13 +70,13 @@ export const HrProjectManagerPage: React.FC = () => {
 
   return (
     <>
-      <TitlePageComponent titleName={isEdit? 'Редактирование проекта' : 'Добавление проекта'} />
+      <TitlePageComponent titleName={isEdit? 'Редактирование продукта' : 'Добавление продукта'} />
       <div className="container">
-        {isEdit && !editableProject ? <p>Проекта с данным id не существует.</p> :
+        {isEdit && !editableProject ? <p>Продукт с данным id не существует.</p> :
           <>
             <Form className="py-5" onSubmit={sendForm}>
               <Form.Group as={Row} className="mb-3" controlId="name">
-                <Form.Label column sm="2">Название проекта<i className="text-danger">*</i></Form.Label>
+                <Form.Label column sm="2">Название продукта<i className="text-danger">*</i></Form.Label>
                 <Col sm="6">
                   <Form.Control
                     required
@@ -84,11 +84,11 @@ export const HrProjectManagerPage: React.FC = () => {
                     name='name'
                     value={project.name}
                     type="text"
-                    placeholder="Введите имя проекта" />
+                    placeholder="Введите имя продукта" />
                 </Col>
               </Form.Group>
               <Form.Group as={Row} className="mb-3" controlId="description">
-                <Form.Label column sm="2">Описание проекта<i className="text-danger">*</i></Form.Label>
+                <Form.Label column sm="2">Описание продукта<i className="text-danger">*</i></Form.Label>
                 <Col sm="6">
                   <Form.Control
                     name='description'
@@ -97,7 +97,7 @@ export const HrProjectManagerPage: React.FC = () => {
                     required
                     value={project.description}
                     rows={3}
-                    placeholder="Напишите описание проекту" />
+                    placeholder="Напишите описание продукта" />
                 </Col>
               </Form.Group>
               <Form.Group as={Row} className="mb-5" controlId="deskLink">

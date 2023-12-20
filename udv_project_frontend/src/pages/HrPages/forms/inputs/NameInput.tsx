@@ -12,6 +12,7 @@ export const NameInput: React.FC<TextInputDate> = ({ value, handleChangeForm, in
           name='name'
           value={value}
           type="text"
+          maxLength={20}
           placeholder="Введите имя сотрудника" />
       </Col>
     </Form.Group>

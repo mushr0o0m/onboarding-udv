@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import { mapEmployeeToResponseEmployee, mapResponseEmployeeToEmployee } from '../../../indext';
+import { mapEmployeeToResponseEmployee, mapEmployeeToResponseEmployeeWithouTasks, mapResponseEmployeeToEmployee } from '../../../indext';
 
 const apiUrl = 'http://127.0.0.1:8000';
 
@@ -52,6 +52,24 @@ export const postEmployee = async (employee: Omit<Employee, 'id' | 'tasks'>, tas
 
   } catch (error) {
     console.error('Post Employee Error:',
+      (error as AxiosError)?.response || (error as Error).message);
+    throw error;
+  }
+};
+
+export const putEmployee = async (employee: Omit<Employee, 'tasks'>, token: string | null): Promise<Employee> => {
+  try {
+    const response = await axios.put(`${apiUrl}/api/worker/${employee.id}/`,
+    mapEmployeeToResponseEmployeeWithouTasks(employee),
+     {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    });
+    return mapResponseEmployeeToEmployee(response.data.post)
+
+  } catch (error) {
+    console.error('Put Employee Error:',
       (error as AxiosError)?.response || (error as Error).message);
     throw error;
   }

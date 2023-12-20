@@ -6,7 +6,7 @@ export const HrWrapperPage: React.FC = () => {
 
   const navs = [
     { title: 'Мои сотрудники', url: '' },
-    { title: 'Проекты', url: 'projects' },
+    { title: 'Продукты', url: 'projects' },
   ]
 
   return (

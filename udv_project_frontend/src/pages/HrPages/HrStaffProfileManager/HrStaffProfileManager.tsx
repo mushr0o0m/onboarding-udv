@@ -27,25 +27,29 @@ export const HrStaffProfileManager: React.FC = () => {
   const { id } = useParams();
   const { addEmployee, editEmployee } = useHrStaff();
 
-  const getEditableEmployee = () => {
-    if (isEdit && id) {
-      const editableEmployee = staff.find(employee => employee.id === parseInt(id || '-1'))
-      if (editableEmployee) {
-        const { id: employeeId, ...employeeWithoutId } = editableEmployee; // Спросить про диструктуризацию
-        return { employeeId, employeeWithoutId };
+  React.useEffect(() => {
+    const getEditableEmployee = () => {
+      if (isEdit && id) {
+        const editableEmployee = staff.find(employee => employee.id === parseInt(id))
+        if (editableEmployee) {
+          setEmployee(editableEmployee);
+          setTasksList(editableEmployee.tasks);
+        }
       }
     }
-    return { employeeId: 0, employeeWithoutId: DEFAULT_EMPLOYEE };
-  };
 
-  const { employeeId, employeeWithoutId } = getEditableEmployee();
-  const [employee, setEmployee] = React.useState<Omit<Employee, 'id' | 'tasks'>>(employeeWithoutId);
-  const [taskList, setTasksList] = React.useState<Omit<Task, 'id'>[]>(employeeWithoutId.tasks);
+    getEditableEmployee();
+  }, [isEdit, id, staff])
+
+  const [employee, setEmployee] = React.useState<Omit<Employee, 'id' | 'tasks'>>(DEFAULT_EMPLOYEE);
+  const [taskList, setTasksList] = React.useState<Omit<Task, 'id'>[]>([]);
 
   const sendForm = ((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isEdit)
-      editEmployee(employeeId, employee, taskList);
+    if (isEdit && id){
+      editEmployee({id: parseInt(id), ...employee});
+    }
+      
     else
       addEmployee(employee, taskList);
     navigate(`/hr`);

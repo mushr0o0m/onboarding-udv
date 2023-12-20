@@ -99,6 +99,7 @@ type GameObject = {
   max: number,
   imagePath: string,
   count_stars: number,
+  [key: string]: number | boolean | string; 
 }
 
 //interface

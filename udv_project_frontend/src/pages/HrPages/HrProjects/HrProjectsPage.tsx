@@ -17,11 +17,11 @@ export const HrProjectsPage: React.FC = () => {
 
   return (
     <>
-      <TitlePageComponent titleName='Проекты' />
+      <TitlePageComponent titleName='Продукты' />
       <Projects deleteProject={deleteProject}/>
       <DeleteConfirmationDialog
-        title='Удалить проект?'
-        description='Вы действительно хотите удалить проект?'
+        title='Удалить продукт?'
+        description='Вы действительно хотите удалить продукт?'
         show={modalShow}
         onHide={() => setModalShow(false)} onDelete={() => (deleteProjectId && removeProject(deleteProjectId))} />
     </>

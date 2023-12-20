@@ -39,7 +39,6 @@ export const TaskList: React.FC = () => {
               overlay={toolTip()}
               delay={{ show: 200, hide: 200 }}
               show={showTooltip(task.id)}
-              // onToggle={(() => showTooltip(task.id))}
             >
               <Form.Check.Input
                 type='checkbox'

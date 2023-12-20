@@ -11,13 +11,13 @@ function App() {
   return (
     <AuthProvider>
       <TodoProvider>
-        <HrStaffProvider>
-          <HrProjectsProvider>
-            <GameProvider>
+        <GameProvider>
+          <HrStaffProvider>
+            <HrProjectsProvider>
               <AppRouter />
-            </GameProvider>
-          </HrProjectsProvider>
-        </HrStaffProvider>
+            </HrProjectsProvider>
+          </HrStaffProvider>
+        </GameProvider>
       </TodoProvider>
     </AuthProvider>
   );

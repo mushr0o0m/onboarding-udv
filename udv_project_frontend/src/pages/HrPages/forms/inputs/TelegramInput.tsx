@@ -13,7 +13,9 @@ export const TelegramInput: React.FC<TextInputDate> = ({ value, handleChangeForm
             name='telegram'
             value={value}
             type="text"
-            placeholder="Введите ссылку на телеграмм сотрудника" />
+            placeholder="Введите ссылку на телеграмм сотрудника" 
+            maxLength={20}
+            />
         </InputGroup>
       </Col>
     </Form.Group>

@@ -17,3 +17,12 @@ export const mapEmployeeToResponseEmployee =
     employmentDate: getFormatedDate(employee.employmentDate, "yyyy-MM-dd"),
     tasks: employee.tasks.map(task => ({ name: task.name }))
   });
+
+  export const mapEmployeeToResponseEmployeeWithouTasks =
+  (employee: Omit<Employee, 'tasks'>):
+    Omit<ResponseEmployee, 'tasks' | 'hr_id' | 'user_id'> =>
+  ({
+    ...employee,
+    telegram: employee.telegram || '',
+    employmentDate: getFormatedDate(employee.employmentDate, "yyyy-MM-dd"),
+  });

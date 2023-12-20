@@ -2,6 +2,8 @@ import React from 'react';
 import { Navbar, Nav, Image, Container, NavDropdown, Col } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../utils/indext';
+import { useGame } from '../../utils/contextes/GameContext/useGame';
+import { StarNavbarIcon } from './components/StarNavbarIcon';
 
 
 interface NavbarComponentProps {
@@ -12,8 +14,8 @@ interface NavbarComponentProps {
 
 export const NavbarComponent: React.FC<NavbarComponentProps> = ({ homeUrl, navs, userName }) => {
   const navigate = useNavigate();
-  const { token, signOut } = useAuth();
-
+  const { token, signOut, userType } = useAuth();
+  const { game } = useGame();
   const logout = (() => {
     if (token)
       signOut(token)
@@ -44,13 +46,14 @@ export const NavbarComponent: React.FC<NavbarComponentProps> = ({ homeUrl, navs,
           </Col>
           <Col sm={3}>
             <div className="d-flex justify-content-center">
+              {userType === 'WR' && <StarNavbarIcon countStar={game?.count_stars}/>}
               <NavDropdown
                 id="logout-nav-dropdown"
                 drop='down'
                 align='end'
                 title={<Image
-                  width={40}
-                  height={40}
+                  width={44}
+                  height={44}
                   src="../../src/assets/user_avatar.svg" />}
               >
                 <NavDropdown.Header>{userName ? userName : 'Уважаемый пользователь'}</NavDropdown.Header>

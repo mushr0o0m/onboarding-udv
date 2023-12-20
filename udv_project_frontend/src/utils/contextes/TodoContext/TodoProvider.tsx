@@ -3,6 +3,7 @@ import { TodoContext } from './TodoContext';
 import { deleteSubtask, getFirstDayTasks, getTaskList, patchFirstDayTask, patchSubtask, patchTask, postSubtask, putSubtask } from './api/TodoRequests';
 import { useAuth } from '../AuthContext/useAuth';
 import { AxiosError } from 'axios';
+import { useGame } from '../GameContext/useGame';
 
 interface TodoProviderProps {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
   const [firstDayTasks, setFirstDayTasks] = React.useState<Task[]>([])
   const [isFirstDayFinish, setIsFirstDayFinish] = React.useState<boolean>(false);
   const { token, userType, signOut } = useAuth();
+  const { fetchGameObject } = useGame();
 
   React.useEffect(() => {
     const fetchTaskList = async () => {
@@ -57,8 +59,8 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
       setIsFirstDayFinish(result);
     });
 
-    if(token && userType === 'WR' && firstDayTasks)
-    checkIsFirstDayFinished()
+    if (token && userType === 'WR' && firstDayTasks)
+      checkIsFirstDayFinished()
   }, [token, userType, firstDayTasks]);
 
 
@@ -74,10 +76,10 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
             }
           })
       });
-      return isSubtasksChecked;
+    return isSubtasksChecked;
   }
 
-  
+
 
   const addSubTaskToTask = ({ name, description, result, taskId }: Omit<SubTask, 'checked' | 'id'>) => {
     const newSubTask = {
@@ -113,6 +115,7 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
 
   const markTask = (taskId: Task['id'], taskChecked: Task['checked']) => {
     patchTask(taskId, taskChecked, token)
+      .then(() => fetchGameObject())
       .then(() =>
         setTasks(prevTasks => prevTasks.map(task => {
           if (task.id === taskId)
@@ -160,6 +163,7 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
 
   const clearFirstDayTasks = (() => {
     setFirstDayTasks([]);
+    fetchGameObject();
   })
 
   const value = {

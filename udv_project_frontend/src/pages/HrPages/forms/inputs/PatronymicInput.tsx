@@ -11,7 +11,9 @@ export const PatronymicInput: React.FC<TextInputDate> = ({ value, handleChangeFo
           name='patronymic'
           value={value}
           type="text"
-          placeholder="Введите отчество сотрудника" />
+          placeholder="Введите отчество сотрудника" 
+          maxLength={20}
+          />
       </Col>
     </Form.Group>
   )

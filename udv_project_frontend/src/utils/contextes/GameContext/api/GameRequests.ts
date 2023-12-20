@@ -17,9 +17,9 @@ export const getGameInfo = async (token: string | null): Promise<GameObject> => 
   }
 };
 
-export const putGameBack = async (token: string | null): Promise<GameObject> => {
+export const putGameBack = async (elementId: number, token: string | null): Promise<GameObject> => {
     try {
-      const response = await axios.put(`${apiUrl}/api/game/1/`, {
+      const response = await axios.put(`${apiUrl}/api/game/${elementId}/`, { }, {
         headers: {
           Authorization: `Token ${token}`,
         },

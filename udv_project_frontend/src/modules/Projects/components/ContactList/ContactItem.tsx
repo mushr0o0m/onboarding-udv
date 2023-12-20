@@ -11,8 +11,8 @@ export const ContactItem: React.FC<ContactItemProps> = ({ contact, isFirstItem }
   return (
     <ListGroup.Item className={isFirstItem ? 'border-top-0' : ''}>
       <div >
-        <span className="text-primary text-decoration-underline fw-semibold">
-          {`${contact.name} ${contact.surname} ${contact.patronymic}`}
+        <span className="text-primary fw-semibold">
+          {`${contact.surname} ${contact.name} ${contact.patronymic}`}
         </span>
         <span> — {contact.jobTitle}</span>
       </div>

@@ -13,7 +13,9 @@ export const EmailInput: React.FC<TextInputDate> = ({ value, handleChangeForm, r
           name='email'
           value={value}
           type="email"
-          placeholder="Введите почту сотрудника" />
+          placeholder="Введите почту сотрудника"
+          maxLength={50}
+           />
       </Col>
     </Form.Group>
   )

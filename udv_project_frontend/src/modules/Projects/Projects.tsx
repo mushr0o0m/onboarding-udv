@@ -1,7 +1,7 @@
 import React from 'react'
 import { SearchForPage } from '../../components/indext'
-import { ProjectList } from '../../pages/HrPages/HrProjects/components/ProjectList/ProjectList'
 import { useHrProjects } from '../../utils/indext';
+import { ProjectList } from './components/indext';
 
 interface ProjectsProps {
   isReadOnly?: boolean;
@@ -36,7 +36,7 @@ export const Projects: React.FC<ProjectsProps> = ({ deleteProject, isReadOnly })
       <SearchForPage
         handleSearchChange={handleSearchChange}
         searchQuery={searchQuery}
-        addBtnText={!isReadOnly ? 'Добавить проект' : undefined}
+        addBtnText={!isReadOnly ? 'Добавить продукт' : undefined}
         addBtnTo={!isReadOnly ? 'create' : undefined}
       />
       {isNoResults && <p>Проекты по заданным параметрам не найдены, попробуйте снова.</p>}

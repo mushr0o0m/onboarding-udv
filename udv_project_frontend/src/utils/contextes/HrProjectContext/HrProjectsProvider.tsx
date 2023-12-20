@@ -33,7 +33,7 @@ export const HrProjectsProvider: React.FC<HrProjectsProviderProps> = (({ childre
       }
     };
 
-    if (token) {
+    if (token && userType) {
       fetchProjectList();
       fetchContactList();
     }
@@ -49,7 +49,7 @@ export const HrProjectsProvider: React.FC<HrProjectsProviderProps> = (({ childre
       }
     };
 
-    if (token && idForGetProject) {
+    if (token && idForGetProject && userType) {
       fetchProjectById();
     }
   }, [token, userType, idForGetProject]);
@@ -58,8 +58,8 @@ export const HrProjectsProvider: React.FC<HrProjectsProviderProps> = (({ childre
     postProject({ ...project, contactsIds }, token)
       .then((project) =>
         setProjects((prevProject) => [
+          project,
           ...prevProject,
-          project
         ]));
   };
 

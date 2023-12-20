@@ -1,46 +1,43 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { GameContext } from './GameContext';
 import { getGameInfo, putGameBack } from './api/GameRequests';
 import { useAuth } from '../AuthContext/useAuth';
-import { useTodo } from '../indext';
 
 interface GameProviderProps {
   children: React.ReactNode;
 }
 
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
-  const [game, setGame] = React.useState<GameObject|null>(null);
+  const [game, setGame] = React.useState<GameObject | null>(null);
   const { token, userType } = useAuth();
-  const { tasks } = useTodo();
 
+  
+  const fetchGameObject = useCallback(() => {
+    getGameInfo(token)
+    .then((gameInfo) => {
+      setGame(gameInfo);
+    })
+    .catch((error) => console.error('Error fetching game info:', error));
+  }, [token])
+  
   React.useEffect(() => {
-    const fetchGameObject = async () => {
-      getGameInfo(token)
-        .then((gameInfo) => {
-            console.log(gameInfo)
-            setGame(gameInfo)})
-        .catch((error) => console.error('Error fetching game info:', error));
-
-    };
-
     if (token && userType === 'WR') {
       fetchGameObject();
     }
-  }, [token, userType, tasks]);
+  
+    console.log('fetchGameObject');
+  }, [fetchGameObject, token, userType]);
 
-  const byeGameBack = () => {
-    putGameBack(token)
-    .then((gameInfo) => {
-        console.log(gameInfo)
-        setGame(gameInfo)})
-    .catch((error) => console.error('Error put game back:', error));
+  const buyElementById = (elementId: number) => {
+    putGameBack(elementId, token)
+      .then((gameInfo) => setGame(gameInfo));
   };
 
   const value = {
     game,
-    byeGameBack
+    buyElementById,
+    fetchGameObject
   };
-
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 };

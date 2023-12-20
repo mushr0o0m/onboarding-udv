@@ -1,6 +1,6 @@
 import React from 'react'
 import { HrStaffContext } from './HrStaffContext'
-import { getEmployeeById, getEmployeeList, postEmployee, deleteEmployee } from './api/WorkerRequests';
+import { getEmployeeById, getEmployeeList, postEmployee, deleteEmployee, putEmployee } from './api/WorkerRequests';
 import { useAuth } from '../../indext';
 
 interface HrStaffProviderProps {
@@ -57,44 +57,33 @@ export const HrStaffProvider: React.FC<HrStaffProviderProps> = (({ children }) =
     postEmployee(employee, tasks, token)
       .then((employee) =>
         setStaff((prevPerson) => [
+          employee,
           ...prevPerson,
-          employee
         ]));
   };
 
   const editEmployee = (
-    id: Employee['id'],
-    updatedEmployee: Omit<Employee, 'id' | 'tasks'>,
-    updatedTaskList: Omit<Task, 'id'>[]
-  ) => {
-    setStaff((prevStaff) => {
-      return prevStaff.map((employee) => {
-        if (employee.id === id) {
-          const updatedEmployeeWithTasks: Employee = {
-            ...employee,
-            ...updatedEmployee,
-            tasks: updatedTaskList.map((task, index) => ({
-              ...task,
-              id: index + 1
-            }))
-          };
-
-          return updatedEmployeeWithTasks;
-        }
-        return employee;
-      });
-    });
-  };
+    employee: Omit<Employee, 'tasks'>
+  ) =>
+    putEmployee(employee, token)
+      .then((updatedEmployee) =>
+        setStaff((prevStaff) =>
+          prevStaff.map((curEmployee) => {
+            if (curEmployee.id === employee.id)
+              return updatedEmployee;
+            return curEmployee;
+          })
+        ));
 
 
   const value = {
-      staff,
-      employee,
-      setEmployeeId,
-      removeEmployee,
-      addEmployee,
-      editEmployee,
-    }
+    staff,
+    employee,
+    setEmployeeId,
+    removeEmployee,
+    addEmployee,
+    editEmployee,
+  }
 
   return (
     <HrStaffContext.Provider value={value}>

@@ -5,7 +5,7 @@ import { Projects } from '../../../modules/Projects/Projects';
 export const ApprenticeEducationPage: React.FC = () => {
     return (
         <>
-        <TitlePageComponent titleName='Мое обучение'/>
+        <TitlePageComponent titleName='Продукты'/>
         <Projects isReadOnly={true} />
         </>
     );

@@ -103,6 +103,7 @@ export const patchSubtask = async (id: SubTask['id'], checked: boolean, token: s
 
 export const patchTask = async (taskId: Task['id'], checked: boolean, token: string | null) => {
   try {
+    console.log('patchTask')
     axios.patch(`${apiUrl}/api/tasks/${taskId}/`, { is_completed: checked }, {
       headers: {
         Authorization: `Token ${token}`,
