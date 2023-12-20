@@ -11,7 +11,7 @@ export const ApprenticeMainPage: React.FC = () => {
 
   const navs = [
     { title: 'Мои задачи', url: 'criteria' },
-    { title: 'Мое обучение', url: 'education' },
+    { title: 'Продукты', url: 'education' },
     { title: 'Мой офис', url: 'office' },
   ]
 

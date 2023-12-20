@@ -79,8 +79,6 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
     return isSubtasksChecked;
   }
 
-
-
   const addSubTaskToTask = ({ name, description, result, taskId }: Omit<SubTask, 'checked' | 'id'>) => {
     const newSubTask = {
       description, name, checked: false, taskId, result
@@ -97,7 +95,8 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
   };
 
   const markSubTask = (id: SubTask['id'], taskId: SubTask['taskId']) => {
-    patchSubtask(id, true, token).then(() => {
+    patchSubtask(id, true, token)
+    .then(() => {
       setTasks(prevTask =>
         prevTask.map(task => {
           if (task.id === taskId)
@@ -110,7 +109,8 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
             }
           return task
         }));
-    });
+    })
+    .then(() => fetchGameObject());
   };
 
   const markTask = (taskId: Task['id'], taskChecked: Task['checked']) => {
@@ -134,6 +134,7 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({ children }) => {
           return task;
         }))
       )
+      .then(() => fetchGameObject)
   };
 
   const deleteSubTask = (id: SubTask['id'], taskId: SubTask['taskId']) => {

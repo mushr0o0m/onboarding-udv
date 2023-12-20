@@ -13,6 +13,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   
   const fetchGameObject = useCallback(() => {
+    console.log('fetchGameObject')
     getGameInfo(token)
     .then((gameInfo) => {
       setGame(gameInfo);
