@@ -12,6 +12,25 @@ from password_generator import PasswordGenerator
 from django.http import Http404
 from django.http import HttpResponseBadRequest
 import decimal
+from rest_framework.exceptions import APIException
+from django.utils.encoding import force_str
+from rest_framework import status
+
+
+class CustomValidation(APIException):
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    default_detail = 'A server error occurred.'
+
+    def __init__(self, detail, field, status_code):
+        if status_code is not None:
+            self.status_code = status_code
+        if detail is not None:
+            self.detail = {field: force_str(detail),
+                           'errors': {
+                               'email': 'Email уже существует'
+                           }}
+        else:
+            self.detail = {'detail': force_str(self.default_detail)}
 
 
 class TasksListView(APIView):
@@ -200,7 +219,7 @@ class WorkerView(APIView):
         try:
             user = User.objects.create_user(email=data['email'], password=password)
         except:
-            return HttpResponseBadRequest('user with this email is already exists')
+            raise CustomValidation('Конфликт','message', status_code=status.HTTP_409_CONFLICT)
 
         send_mail('Регистрация на сервисе для онбординга UDV',
                   'Похоже вы недавно устроились на работу в UDV, поздравляем! Ваш Hr, ' + str(hr.name) +
@@ -701,7 +720,7 @@ class GameView(APIView):
                          })
 
 
-class IsOnboardingOver(APIView):
+class IsOnboardingOverView(APIView):
     def get(self, request, *args, **kwargs):
         try:
             worker = Worker.objects.get(user_id=request.user.id)
@@ -729,3 +748,12 @@ class IsOnboardingOver(APIView):
         worker.is_over = True
         worker.save()
         return Response({"post": worker.is_over})
+
+
+class StarsView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            worker = Worker.objects.get(user_id=request.user.id)
+        except:
+            raise Http404
+        return Response({"post": int(worker.stars)})
