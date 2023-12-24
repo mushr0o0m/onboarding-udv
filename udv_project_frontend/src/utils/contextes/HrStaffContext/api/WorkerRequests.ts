@@ -51,8 +51,10 @@ export const postEmployee = async (employee: Omit<Employee, 'id' | 'tasks'>, tas
     return mapResponseEmployeeToEmployee(response.data.worker)
 
   } catch (error) {
-    console.error('Post Employee Error:',
+    if((error as AxiosError)?.response?.status !== 409){
+      console.error('Post Employee Error:',
       (error as AxiosError)?.response || (error as Error).message);
+    }
     throw error;
   }
 };

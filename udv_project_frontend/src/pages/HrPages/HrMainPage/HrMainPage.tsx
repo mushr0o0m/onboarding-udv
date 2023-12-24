@@ -1,8 +1,8 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { NavbarComponent } from '../../components/Navbar/NavbarComponent';
+import { NavbarComponent } from '../../../modules/indext';
 
-export const HrWrapperPage: React.FC = () => {
+export const HrMainPage: React.FC = () => {
 
   const navs = [
     { title: 'Мои сотрудники', url: '' },

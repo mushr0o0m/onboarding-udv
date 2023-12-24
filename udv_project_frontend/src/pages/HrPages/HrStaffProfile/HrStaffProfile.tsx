@@ -1,9 +1,9 @@
 import React from 'react';
-import { TitlePageComponent } from '../../components/TitlePage/TitlePageComponent';
+import { TitlePageComponent } from '../../../components/TitlePage/TitlePageComponent';
 import { Button, ListGroup } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
-import { DeleteConfirmationDialog } from '../../components/DeleteConfirmationDialog';
-import { getFormatedDate, useHrStaff } from '../../utils/indext';
+import { DeleteConfirmationDialog } from '../../../components/DeleteConfirmationDialog';
+import { getFormatedDate, useHrStaff } from '../../../utils/indext';
 
 export const HrStaffProfile: React.FC = () => {
   const [modalShow, setModalShow] = React.useState(false);

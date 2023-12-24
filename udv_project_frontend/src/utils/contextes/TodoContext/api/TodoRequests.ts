@@ -29,10 +29,10 @@ export const getFirstDayTasks = async (token: string | null): Promise<Task[]> =>
     return response.data.tasks.map((task: ResponseTask) => mapResponseTasksToTasks(task));
 
   } catch (error) {
-    console.log(typeof error)
     if((error as AxiosError)?.response?.status != 400)
       {
-        console.error('Get First Day Tasks Error:', (error as AxiosError)?.response || (error as Error).message)}
+        console.error('Get First Day Tasks Error:', (error as AxiosError)?.response || (error as Error).message)
+      }
     throw error;
   }
 };

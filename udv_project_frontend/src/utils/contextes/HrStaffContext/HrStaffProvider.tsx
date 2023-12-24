@@ -2,6 +2,7 @@ import React from 'react'
 import { HrStaffContext } from './HrStaffContext'
 import { getEmployeeById, getEmployeeList, postEmployee, deleteEmployee, putEmployee } from './api/WorkerRequests';
 import { useAuth } from '../../indext';
+import { AxiosError } from 'axios';
 
 interface HrStaffProviderProps {
   children: React.ReactNode;
@@ -55,13 +56,19 @@ export const HrStaffProvider: React.FC<HrStaffProviderProps> = (({ children }) =
       )
   };
 
-  const addEmployee = (employee: Omit<Employee, 'id' | 'tasks'>, tasks: Omit<Task, 'id'>[]) => {
-    postEmployee(employee, tasks, token)
+  const addEmployee = (employee: Omit<Employee, 'id' | 'tasks'>, tasks: Omit<Task, 'id'>[]): Promise<void> => {
+    return postEmployee(employee, tasks, token)
       .then((employee) =>
         setStaff((prevPerson) => [
           employee,
           ...prevPerson,
-        ]));
+        ]))
+      .catch((error: AxiosError) => {
+        if (error.response?.status !== 400) {
+          console.error('Error fetching first day tasks:', error);
+        }
+        throw error;
+      });
   };
 
   const editEmployee = (

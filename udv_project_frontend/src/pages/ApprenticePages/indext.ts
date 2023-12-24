@@ -1,0 +1,5 @@
+export * from './ApprenticeEducationPage/indext'
+export * from './ApprenticeFirstDayPage/indext'
+export * from './ApprenticeMainPage/indext'
+export * from './ApprenticeOfficePage/indext'
+export * from './ApprenticeTodoPage/indext'

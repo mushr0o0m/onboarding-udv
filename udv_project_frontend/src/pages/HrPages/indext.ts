@@ -1,0 +1,6 @@
+export * from './HrMainPage/indext'
+export * from './HrProjectManager/indext'
+export * from './HrProjects/indext'
+export * from './HrStaffList/indext'
+export * from './HrStaffProfile/indext'
+export * from './HrStaffProfileManager/indext'

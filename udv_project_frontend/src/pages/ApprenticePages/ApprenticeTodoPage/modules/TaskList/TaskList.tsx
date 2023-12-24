@@ -1,21 +1,16 @@
 import React from 'react';
 import { Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { SubTaskList } from './SubTaskList';
-import { useTodo } from '../../../utils/indext';
-import { useGame } from '../../../utils/contextes/GameContext/useGame';
+import { SubTaskList } from './components/SubTaskList';
+import { useTodo } from '../../../../../utils/indext';
 
 
 export const TaskList: React.FC = () => {
 
   const { tasks, markTask, checkSubtasks } = useTodo();
-  const {fetchGameObject} = useGame();
 
   const onChangeTaskCheck = ((event: React.ChangeEvent<HTMLInputElement>, id: Task['id']) => {
     if (checkSubtasks(id)) 
-      {
         markTask(id, true);
-        fetchGameObject();
-    }
     else 
       event.preventDefault();
   });

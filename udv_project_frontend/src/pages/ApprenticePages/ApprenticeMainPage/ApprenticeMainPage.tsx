@@ -1,11 +1,11 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { NavbarComponent } from '../../../components/Navbar/NavbarComponent';
 import { useAuth, useTodo } from '../../../utils/indext';
 import { useGame } from '../../../utils/contextes/GameContext/useGame';
 import { getOnboardingOverStatus, putOnboardingOverStatus } from './api/onboardingOverRequest';
 import { OnboardingFinishModal } from './components/OnboardingFinishModal';
 import Confetti from 'react-confetti';
+import { NavbarComponent } from '../../../modules/indext';
 
 export const ApprenticeMainPage: React.FC = () => {
 

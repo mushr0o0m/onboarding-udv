@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { SubtaskManagerModal } from './SubtaskManagerModal';
-import { useTodo } from '../../../utils/indext';
+import { useTodo } from '../../../../utils/indext';
 
 
 export const BtnController: React.FC = () => {

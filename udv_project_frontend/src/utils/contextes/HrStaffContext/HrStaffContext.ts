@@ -5,7 +5,7 @@ export interface HrStaffContextProps {
     employee: Employee | null;
     setEmployeeId: React.Dispatch<React.SetStateAction<number | undefined>>;
     removeEmployee: (id: Employee['id']) => void;
-    addEmployee: (employee: Omit<Employee, 'id' | 'tasks'>, tasks: Omit<Task, 'id'>[]) => void;
+    addEmployee: (employee: Omit<Employee, 'id' | 'tasks'>, tasks: Omit<Task, 'id'>[]) => Promise<void>;
     editEmployee: (
         employee: Omit<Employee, 'tasks'>
       ) => void;
@@ -16,6 +16,6 @@ export const HrStaffContext = React.createContext<HrStaffContextProps>({
     employee: null,
     setEmployeeId: () => {},
     removeEmployee: () => {},
-    addEmployee: () => {},
+    addEmployee: async () => {},
     editEmployee: () => {},
 });

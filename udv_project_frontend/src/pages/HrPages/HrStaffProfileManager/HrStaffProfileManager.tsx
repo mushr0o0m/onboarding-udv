@@ -6,6 +6,7 @@ import { AdaptationCriteriaForm } from './components/AdaptationCriteriaForm';
 import { AdaptationCriteriaList } from './components/AdaptationCriteriaList';
 import { getFormatedDate, useHrStaff } from '../../../utils/indext';
 import { EmailInput, NameInput, PatronymicInput, SurnameInput, TelegramInput, TitleJobInput } from '../forms/indext';
+import { AxiosError } from 'axios';
 
 const DEFAULT_EMPLOYEE = {
   name: '',
@@ -26,6 +27,7 @@ export const HrStaffProfileManager: React.FC = () => {
   const isEdit = location.pathname.includes('/edit');
   const { id } = useParams();
   const { addEmployee, editEmployee } = useHrStaff();
+  const [isValidEmail, setIsValidEmail] = React.useState<boolean>();
 
   React.useEffect(() => {
     const getEditableEmployee = () => {
@@ -46,13 +48,19 @@ export const HrStaffProfileManager: React.FC = () => {
 
   const sendForm = ((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isEdit && id){
-      editEmployee({id: parseInt(id), ...employee});
+    if (isEdit && id) {
+      editEmployee({ id: parseInt(id), ...employee });
+      navigate(`/hr`);
     }
-      
-    else
-      addEmployee(employee, taskList);
-    navigate(`/hr`);
+    else {
+      addEmployee(employee, taskList)
+      .then(() => navigate(`/hr`))
+      .catch((error) => {
+        if((error as AxiosError)?.response?.status === 409)
+        setIsValidEmail(false);
+      });
+    }
+    
   })
 
   const handleChangeForm = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,8 +84,8 @@ export const HrStaffProfileManager: React.FC = () => {
       <Form className="container py-5" onSubmit={sendForm}>
         <NameInput value={employee.name} handleChangeForm={handleChangeForm} inputColSize={6} />
         <SurnameInput value={employee.surname} handleChangeForm={handleChangeForm} inputColSize={6} />
-        <PatronymicInput value={employee.patronymic || ''} handleChangeForm={handleChangeForm} inputColSize={6}/>
-        <TitleJobInput value={employee.jobTitle} handleChangeForm={handleChangeForm} inputColSize={6}/>
+        <PatronymicInput value={employee.patronymic || ''} handleChangeForm={handleChangeForm} inputColSize={6} />
+        <TitleJobInput value={employee.jobTitle} handleChangeForm={handleChangeForm} inputColSize={6} />
 
         <Form.Group as={Row} className="mb-5" controlId="employmentDate">
           <Form.Label column sm="2">Дата приема на работу<i className="text-danger">*</i></Form.Label>
@@ -91,8 +99,8 @@ export const HrStaffProfileManager: React.FC = () => {
 
         <div className="mb-5">
           <h5 className="mb-3">Контакты</h5>
-          <EmailInput readonly={isEdit} value={employee.email} handleChangeForm={handleChangeForm} inputColSize={6}/>
-          <TelegramInput value={employee.telegram || ''} handleChangeForm={handleChangeForm} inputColSize={6}/>
+          <EmailInput readonly={isEdit} value={employee.email} handleChangeForm={handleChangeForm} inputColSize={6} isValid={isValidEmail}/>
+          <TelegramInput value={employee.telegram || ''} handleChangeForm={handleChangeForm} inputColSize={6} />
         </div>
 
         {!isEdit &&

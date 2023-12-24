@@ -1,7 +1,7 @@
 import React from 'react';
-import { TaskList } from './TaskList';
+import { TaskList } from './modules/TaskList/TaskList';
 import { TodoProvider } from '../../../utils/indext';
-import { BtnController } from './BtnController';
+import { BtnController } from './modules/BtnController';
 import { TitlePageComponent } from '../../../components/TitlePage/TitlePageComponent';
 
 export const ApprenticeTodoPage: React.FC = () => {
